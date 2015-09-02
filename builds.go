@@ -57,7 +57,7 @@ func createBuild(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(err.Error()))
 		return
 	}
-	writeBody(Object{Name: fileName, ModTime: time.Now(), CheckSum: fmt.Sprintf("%x", hash.Sum(nil)), Size: size}, rw, 200)
+	writeBody(object{Name: fileName, ModTime: time.Now(), CheckSum: fmt.Sprintf("%x", hash.Sum(nil)), Size: size}, rw, 200)
 }
 
 func deleteBuild(rw http.ResponseWriter, req *http.Request) {
@@ -86,7 +86,7 @@ func listBuilds(rw http.ResponseWriter, req *http.Request) {
 	writeBody(objects, rw, http.StatusOK)
 }
 
-func builds() (objects []Object, err error) {
+func builds() (objects []object, err error) {
 	var filesArr []os.FileInfo
 	filesArr, err = ioutil.ReadDir(dataDir+"builds/")
 	if err != nil {
@@ -94,7 +94,7 @@ func builds() (objects []Object, err error) {
 	}
 	for _, file := range filesArr {
 		if !file.IsDir() {
-			objects = append(objects, Object{Name: file.Name(), Size: file.Size(), ModTime: file.ModTime() })
+			objects = append(objects, object{Name: file.Name(), Size: file.Size(), ModTime: file.ModTime() })
 		}
 	}
 	return	

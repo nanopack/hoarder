@@ -1,6 +1,5 @@
 package main
 
-
 import(
 	"github.com/gorilla/pat"
 	"net/http"
@@ -11,7 +10,7 @@ import(
 )
 
 
-type Object struct {
+type object struct {
 	Name     string
 	CheckSum string
 	ModTime  time.Time

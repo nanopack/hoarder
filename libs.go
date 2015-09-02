@@ -39,6 +39,6 @@ func createLibs(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(err.Error()))
 		return
 	}
-	writeBody(Object{Name: fileName, ModTime: time.Now(), CheckSum: fmt.Sprintf("%x", hash.Sum(nil)), Size: size}, rw, 200)
+	writeBody(object{Name: fileName, ModTime: time.Now(), CheckSum: fmt.Sprintf("%x", hash.Sum(nil)), Size: size}, rw, 200)
 }
 

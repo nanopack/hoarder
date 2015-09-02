@@ -4,13 +4,17 @@ Warehouse is a storage system for builds and cached libraries for all apps using
 
 ## Configuration:
 
-When starting up there are 4 options: 
+you start warehouse by passing a config file (warehouse /path/to/config). If the config file is not passed a default set of options will be used.
+
 ```
+# NA-Warehouse config file
+
 # The address you want me to listen to
 # ip and port are important
 listenAddr 0.0.0.0:1234
-# How much logging you want
 
+# show a specific amount of logs
+# default value is info
 logLevel info
 
 # the authentication token
@@ -18,7 +22,6 @@ token supersecrettoken
 
 #the folder you want to store the files
 dataDir /tmp/warehouse/
-
 ```
 
 ## Routes:
