@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/pagodabox/nanobox-config"  
+	"github.com/pagodabox/nanobox-config"
 	"strings"
 	"os"
 	"github.com/jcelliott/lumber"
