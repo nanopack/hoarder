@@ -20,7 +20,7 @@ func main() {
 		"listenAddr": ":1234",
 		"logLevel":    "info",
 		"token":       "token",
-		"dataDir":      "/tmp/warehouse/",
+		"dataDir":      "/tmp/hoarder/",
 	}
 
 	config.Load(conf, configFile)
@@ -28,7 +28,7 @@ func main() {
 	// do the stuff
 	level := lumber.LvlInt(conf["logLevel"])
 	log = lumber.NewConsoleLogger(level)
-	log.Prefix("[warehouse]")	
+	log.Prefix("[hoarder]")	
 	dataDir = conf["dataDir"]
 
 	err := Start(conf["listenAddr"], conf["token"])

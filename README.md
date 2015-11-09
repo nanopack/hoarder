@@ -1,13 +1,19 @@
-# Warehouse
+# Hoarder
 
-Warehouse is a storage system for builds and cached libraries for all apps using nanobox in production. It automatically removes the oldest builds once the limit is reached (currently set at 5 and will be adjustable through the API int he future).
+Hoarder is a simple, api-driven storage system for storing code builds and cached libraries for cloud-based deployment services.
+
+It automatically removes the oldest builds once the limit is reached (currently set at 5 and will be adjustable through the API int he future).
+
+## Status
+
+Nearly Complete/Experimental
 
 ## Configuration:
 
-you start warehouse by passing a config file (warehouse /path/to/config). If the config file is not passed a default set of options will be used.
+Start hoarder by passing a config file (hoarder /path/to/config). If the config file is not passed a default set of options will be used.
 
 ```
-# NA-Warehouse config file
+# Hoarder config file
 
 # The address you want me to listen to
 # ip and port are important
@@ -21,7 +27,7 @@ logLevel info
 token supersecrettoken
 
 #the folder you want to store the files
-dataDir /tmp/warehouse/
+dataDir /tmp/hoarder/
 ```
 
 ## Routes:
@@ -38,3 +44,8 @@ dataDir /tmp/warehouse/
 | POST | /libs" | Publish a new libs file, replace anything that already exists |
 | PUT | /libs" | Publish a new libs file, replace anything that already exists |
 
+## Todo
+
+- refactor architecture for cleaner pattern
+- add authentication layer
+- tests
