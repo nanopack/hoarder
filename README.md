@@ -1,3 +1,6 @@
+[![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)
+ [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
+
 # Hoarder
 
 Hoarder is a simple, api-driven storage system for storing code builds and cached libraries for cloud-based deployment services.
@@ -49,3 +52,13 @@ dataDir /tmp/hoarder/
 - refactor architecture for cleaner pattern
 - add authentication layer
 - tests
+
+### Contributing
+
+Contributions to the hoarder project are welcome and encouraged. Hoarder is a [Nanobox](https://nanobox.io) project and contributions should follow the [Nanobox Contribution Process & Guidelines](https://docs.nanobox.io/contributing/).
+
+### Licence
+
+Mozilla Public License Version 2.0
+
+[![open source](http://nano-assets.gopagoda.io/open-src/nanobox-open-src.png)](http://nanobox.io/open-source)
