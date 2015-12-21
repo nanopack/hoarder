@@ -5,7 +5,7 @@
 
 Hoarder is a simple, api-driven storage system for storing code builds and cached libraries for cloud-based deployment services.
 
-It automatically removes the oldest builds once the limit is reached (currently set at 5 and will be adjustable through the API int he future).
+It automatically removes the oldest builds once the limit is reached (currently set at 5 and will be adjustable through the API in the future).
 
 ## Status
 
