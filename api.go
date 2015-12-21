@@ -1,14 +1,13 @@
 package main
 
-import(
-	"github.com/gorilla/pat"
-	"net/http"
+import (
 	"encoding/json"
+	"github.com/gorilla/pat"
 	"github.com/jcelliott/lumber"
+	nanoauth "github.com/nanobox-io/golang-nanoauth"
+	"net/http"
 	"time"
-	"bitbucket.org/nanobox/nanoauth"
 )
-
 
 type object struct {
 	Name     string

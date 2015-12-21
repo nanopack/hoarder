@@ -1,13 +1,13 @@
 package main
 
 import (
-	"net/http"
-	"time"
-	"os"
-	"fmt"
 	"crypto/md5"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"os"
+	"time"
 )
 
 func getBuild(rw http.ResponseWriter, req *http.Request) {
@@ -16,7 +16,7 @@ func getBuild(rw http.ResponseWriter, req *http.Request) {
 }
 
 func getBuildHead(rw http.ResponseWriter, req *http.Request) {
-	filename := dataDir+"builds/"+req.URL.Query().Get(":file")
+	filename := dataDir + "builds/" + req.URL.Query().Get(":file")
 	file, err := os.Open(filename)
 	defer file.Close()
 	if err != nil {
@@ -38,9 +38,9 @@ func createBuild(rw http.ResponseWriter, req *http.Request) {
 	fileName := req.URL.Query().Get(":file")
 
 	// make the directory
-	os.MkdirAll((dataDir+"builds/"), 0777)
+	os.MkdirAll((dataDir + "builds/"), 0777)
 
-	file, err := os.Create(dataDir+"builds/" + fileName)
+	file, err := os.Create(dataDir + "builds/" + fileName)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte(err.Error()))
@@ -67,8 +67,8 @@ func deleteBuild(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
-	err := os.Remove(dataDir+"builds/"+fileName)
-	if err != nil{
+	err := os.Remove(dataDir + "builds/" + fileName)
+	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Write([]byte(err.Error()))
 		return
@@ -88,14 +88,14 @@ func listBuilds(rw http.ResponseWriter, req *http.Request) {
 
 func builds() (objects []object, err error) {
 	var filesArr []os.FileInfo
-	filesArr, err = ioutil.ReadDir(dataDir+"builds/")
+	filesArr, err = ioutil.ReadDir(dataDir + "builds/")
 	if err != nil {
 		return
 	}
 	for _, file := range filesArr {
 		if !file.IsDir() {
-			objects = append(objects, object{Name: file.Name(), Size: file.Size(), ModTime: file.ModTime() })
+			objects = append(objects, object{Name: file.Name(), Size: file.Size(), ModTime: file.ModTime()})
 		}
 	}
-	return	
+	return
 }

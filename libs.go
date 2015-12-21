@@ -1,14 +1,13 @@
 package main
 
 import (
+	"crypto/md5"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"crypto/md5"
-	"io"
 	"time"
-	"fmt"
 )
-
 
 func getLibs(rw http.ResponseWriter, req *http.Request) {
 	log.Info("getFile")
@@ -41,4 +40,3 @@ func createLibs(rw http.ResponseWriter, req *http.Request) {
 	}
 	writeBody(object{Name: fileName, ModTime: time.Now(), CheckSum: fmt.Sprintf("%x", hash.Sum(nil)), Size: size}, rw, 200)
 }
-
