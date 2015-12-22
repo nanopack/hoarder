@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/pagodabox/nanobox-config"
-	"strings"
-	"os"
 	"github.com/jcelliott/lumber"
+	// "github.com/nanopack/hoarder/commands"
+	"github.com/pagodabox/nanobox-config"
+	"os"
+	"strings"
 )
 
 var log lumber.Logger
@@ -18,9 +19,9 @@ func main() {
 
 	conf := map[string]string{
 		"listenAddr": ":1234",
-		"logLevel":    "info",
-		"token":       "token",
-		"dataDir":      "/tmp/hoarder/",
+		"logLevel":   "info",
+		"token":      "token",
+		"dataDir":    "/tmp/hoarder/",
 	}
 
 	config.Load(conf, configFile)
@@ -28,7 +29,7 @@ func main() {
 	// do the stuff
 	level := lumber.LvlInt(conf["logLevel"])
 	log = lumber.NewConsoleLogger(level)
-	log.Prefix("[hoarder]")	
+	log.Prefix("[hoarder]")
 	dataDir = conf["dataDir"]
 
 	err := Start(conf["listenAddr"], conf["token"])
