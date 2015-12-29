@@ -1,56 +1,86 @@
 [![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)
- [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
+[![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
 
-# Hoarder
-
-Hoarder is a simple, api-driven storage system for storing code builds and cached libraries for cloud-based deployment services.
-
-It automatically removes the oldest builds once the limit is reached (currently set at 5 and will be adjustable through the API in the future).
+Hoarder is a simple, api-driven, storage system for storing anything for cloud
+based deployment services.
 
 ## Status
 
 Nearly Complete/Experimental
 
-## Configuration:
+## Usage
 
-Start hoarder by passing a config file (hoarder /path/to/config). If the config file is not passed a default set of options will be used.
+Hoarder can be used in 2 ways:
+
+##### As a server
+To start hoarder as a server run `hoarder --server`. An optional config file can
+be passed with `--config /path/to/config`
+
+##### As a CLI
+Simply run `hoarder <COMMAND>`
+
+`hoarder` or `hoarder -h` will provide help information including usage and a
+list of commands:
 
 ```
-# Hoarder config file
+Usage:
+   [flags]
+   [command]
 
-# The address you want me to listen to
-# ip and port are important
-listenAddr 0.0.0.0:1234
+Available Commands:
+  add         Add file to hoarder storage
+  list        List all files in hoarder storage
+  remove      Remove a file from hoarder storage
+  show        Display a file from the hoarder storage
+  update      Update a file in hoarder
 
-# show a specific amount of logs
-# default value is info
-logLevel info
+Flags:
+  -b, --backend="filesystem": Hoarder backend driver
+      --config="": Path to config options
+  -H, --host="0.0.0.0": Hoarder hostname/IP
+  -i, --insecure[=false]: Disable tls key checking
+      --log-level="info": Hoarder output log level
+  -p, --port=":7410": Hoarder port
+      --server[=false]: Run hoader as a server
+  -t, --token="TOKEN": Hoarder auth token
+  -v, --version[=false]: Display the current version of this CLI
 
-# the authentication token
-token supersecrettoken
+Use " [command] --help" for more information about a command.
+```
 
-#the folder you want to store the files
-dataDir /tmp/hoarder/
+## Configuration
+
+To configure hoarder a config file can be passed with --config. If no config file
+is passed reasonable defaults will be used.
+
+```
+# following are all the available configuration options (all default values are shown)
+Backend    : "filesystem"         # the pluggable backend the api will use for storage
+Driver     : backends.Filesystem  # the actual backend driver
+GCInterval : 0                    # the interval between clearning out old storage (disabled by default)
+GCAmount   : 0                    # the amount of storage to clear at interval (disabled by default)
+Host       : 0.0.0.0              # the connection host
+Insecure   : false                # connect insecurly
+LogLevel   : "info"               # the output log level
+Port       : ":7410"              # the connection port
+Token      : "TOKEN"              # the secury token used to connect with
 ```
 
 ## Routes:
 
-| Method | Route | Functionality |
-| --- | --- | --- |
-| GET | /builds/{file} | Retrieve the build by the file name |
-| HEAD | /builds/{file} | Retrieve just the head of the file which includes NAME and SIZE |
-| POST | /builds/{file} | Publish a New file, if the file exists replace it |
-| PUT | /builds/{file} | Publish a New file, if the file exists replace it |
-| Delete | /builds/{file} | Remove a existing file |
-| GET | /builds" | List all the build files |
-| GET | /libs" | Retrieve the Libs |
-| POST | /libs" | Publish a new libs file, replace anything that already exists |
-| PUT | /libs" | Publish a new libs file, replace anything that already exists |
+```
+| Method |     Route     | Functionality |
+------------------------------------------
+| HEAD   | /blobs/{blob} | Retrieve file information about a blob
+| GET    | /blobs/{blob} | Retrieve a blob
+| GET    | /blobs"       | List all blobs
+| POST   | /blobs/{blob} | Publish a New blob
+| PUT    | /blobs/{blob} | Update an existing blob
+| Delete | /blobs/{blob} | Remove a existing blob
+```
 
 ## Todo
 
-- refactor architecture for cleaner pattern
-- add authentication layer
 - tests
 
 ### Contributing
