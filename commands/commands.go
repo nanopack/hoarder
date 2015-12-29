@@ -6,11 +6,15 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/nanopack/hoarder/api"
-	"github.com/nanopack/hoarder/backends"
 	"github.com/nanopack/hoarder/config"
 )
 
 var (
+	conf    string //
+	server  bool   //
+	version bool   //
+
+	//
 	HoarderCmd = &cobra.Command{
 		Use:   "",
 		Short: "",
@@ -21,12 +25,9 @@ var (
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
 
 			// if --config is passed, attempt to parse the config file
-			if &conf != nil {
+			if conf != "" {
 				config.Parse(conf)
 			}
-
-			// determine/set the backend driver to use
-			config.Driver = backends.Use(config.Backend)
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending of what flags
@@ -34,7 +35,7 @@ var (
 		Run: func(ccmd *cobra.Command, args []string) {
 
 			// if --server is passed start the hoarder server
-			if &server != nil {
+			if server != false {
 				config.Log.Info("Starting hoarder server (listening on port %v)...\n", config.Port)
 
 				// start the API
@@ -48,16 +49,12 @@ var (
 			ccmd.HelpFunc()(ccmd, args)
 		},
 	}
-
-	conf    string //
-	server  bool   //
-	version bool   //
 )
 
 func init() {
 
 	// persistent flags
-	HoarderCmd.PersistentFlags().StringVarP(&config.Backend, "backend", "b", config.DEFAULT_BACKEND, "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.DEFAULT_CONNECTION, "Hoarder backend driver")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.DEFAULT_HOST, "Hoarder hostname/IP")
 	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", false, "Disable tls key checking")
 	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.DEFAULT_LOGLEVEL, "Hoarder output log level")

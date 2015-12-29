@@ -1,32 +1,28 @@
 package api
 
-import (
-	"net/http"
-
-	"github.com/nanopack/hoarder/config"
-)
+import "net/http"
 
 //
 func getBlob(rw http.ResponseWriter, req *http.Request) {
-	config.Driver.Read(req.URL.Query().Get(":blob"))
+	driver.Read(req.URL.Query().Get(":blob"))
 }
 
 //
 func getBlobHead(rw http.ResponseWriter, req *http.Request) {
-	config.Driver.Stat(req.URL.Query().Get(":blob"))
+	driver.Stat(req.URL.Query().Get(":blob"))
 }
 
 //
 func createBlob(rw http.ResponseWriter, req *http.Request) {
-	// config.Driver.Write(req.URL.Query().Get(":blob"))
+	// driver.Write(req.URL.Query().Get(":blob"))
 }
 
 //
 func deleteBlob(rw http.ResponseWriter, req *http.Request) {
-	config.Driver.Remove(req.URL.Query().Get(":blob"))
+	driver.Remove(req.URL.Query().Get(":blob"))
 }
 
 //
 func listBlobs(rw http.ResponseWriter, req *http.Request) {
-	config.Driver.List()
+	driver.List()
 }

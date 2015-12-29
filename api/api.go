@@ -2,27 +2,79 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
-	"time"
+	"net/url"
+	"os"
 
 	"github.com/gorilla/pat"
 	nanoauth "github.com/nanobox-io/golang-nanoauth"
 
+	"github.com/nanopack/hoarder/backends"
 	"github.com/nanopack/hoarder/config"
 )
 
-type object struct {
-	Name     string
-	CheckSum string
-	ModTime  time.Time
-	Size     int64
-}
+type (
+
+	//
+	Driver interface {
+		List() ([]backends.FileInfo, error)
+		Read(string) (io.Reader, error)
+		Remove(string) error
+		Stat(string) (backends.FileInfo, error)
+		Write(string, io.Reader) error
+	}
+)
+
+//
+var driver Driver
 
 // Start
 func Start() error {
 
+	//
+	if err := setDriver(); err != nil {
+		fmt.Println("BONK!", err)
+		os.Exit(1)
+	}
+
 	// blocking...
 	return nanoauth.ListenAndServeTLS(config.Addr, config.Token, routes())
+}
+
+//
+func setDriver() error {
+
+	//
+	u, err := url.Parse(config.Connection)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("URL!! %#v\n", u)
+
+	//
+	switch u.Scheme {
+	case "file":
+		driver = backends.Filesystem{Path: u.Path}
+	// case "s3":
+	// 	driver = backends.S3{Path: u.Path}
+	// case "mongo":
+	// 	driver = backends.Mongo{Path: u.Path}
+	// case "redis":
+	// 	driver = backends.Redis{Path: u.Path}
+	// case "postgres":
+	// 	driver = backends.Postgres{Path: u.Path}
+	default:
+		return fmt.Errorf(`
+Unrecognized scheme '%s'. You can visit https://github.com/nanopack/hoarder and
+submit a pull request adding the scheme or you can submit an issue requesting its
+addition.
+`, u.Scheme)
+	}
+
+	return nil
 }
 
 // routes registers all api routes with the router
