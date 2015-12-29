@@ -7,11 +7,12 @@ import (
 
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Add file to hoarder storage",
+	Short: "Remove a file from hoarder storage",
 	Long:  ``,
 
 	Run: remove,
 }
 
+// remove
 func remove(ccmd *cobra.Command, args []string) {
 }

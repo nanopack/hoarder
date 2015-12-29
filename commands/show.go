@@ -7,11 +7,12 @@ import (
 
 var showCmd = &cobra.Command{
 	Use:   "show",
-	Short: "Add file to hoarder storage",
+	Short: "Display a file from the hoarder storage",
 	Long:  ``,
 
 	Run: show,
 }
 
+// show
 func show(ccmd *cobra.Command, args []string) {
 }

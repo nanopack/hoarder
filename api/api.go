@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/pat"
-	"github.com/jcelliott/lumber"
-	nanoauth "github.com/nanobox-io/golang-nanoauth"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/pat"
+	nanoauth "github.com/nanobox-io/golang-nanoauth"
+
+	"github.com/nanopack/hoarder/config"
 )
 
 type object struct {
@@ -17,51 +19,75 @@ type object struct {
 }
 
 // Start
-func Start(addr, token string) error {
-	return nanoauth.ListenAndServeTLS(addr, token, routes())
+func Start() error {
+
+	// blocking...
+	return nanoauth.ListenAndServeTLS(config.Addr, config.Token, routes())
 }
 
+// routes registers all api routes with the router
 func routes() *pat.Router {
+	config.Log.Debug("[hoarder/api] Registering routes...\n")
+
+	//
 	router := pat.New()
 
-	// builds
-	router.Get("/builds/{file}", handleRequest(getBuild))
-	router.Add("HEAD", "/builds/{file}", handleRequest(getBuildHead))
-	router.Post("/builds/{file}", handleRequest(createBuild))
-	router.Put("/builds/{file}", handleRequest(createBuild))
-	router.Delete("/builds/{file}", handleRequest(deleteBuild))
-	router.Get("/builds", handleRequest(listBuilds))
-
-	// libs
-	router.Get("/libs", handleRequest(getLibs))
-	router.Put("/libs", handleRequest(createLibs))
-	router.Post("/libs", handleRequest(createLibs))
-
-	router.Get("/", func(rw http.ResponseWriter, req *http.Request) {
-		rw.Write([]byte("Γειά σου Κόσμε"))
+	//
+	router.Get("/ping", func(rw http.ResponseWriter, req *http.Request) {
+		rw.Write([]byte("pong"))
 	})
+
+	// blobs
+	router.Add("HEAD", "/blobs/{blob}", handleRequest(getBlobHead))
+	router.Get("/blobs/{blob}", handleRequest(getBlob))
+	router.Get("/blobs", handleRequest(listBlobs))
+	router.Post("/blobs/{blob}", handleRequest(createBlob))
+	router.Put("/blobs/{blob}", handleRequest(createBlob))
+	router.Delete("/blobs/{blob}", handleRequest(deleteBlob))
+
 	return router
 }
 
+// handleRequest is a wrapper for the actual route handler, simply to provide some
+// debug output
 func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
-		lumber.Debug(`
+
+		config.Log.Debug(`
 Request:
 --------------------------------------------------------------------------------
-%#v
-
+%+v
 `, req)
 
 		//
 		fn(rw, req)
-		lumber.Debug(`
+
+		config.Log.Debug(`
 Response:
 --------------------------------------------------------------------------------
-%#v
-
+%+v
 `, rw)
 	}
 }
+
+// parseBody
+// func parseBody(req *http.Request, v interface{}) error {
+//
+// 	//
+// 	b, err := ioutil.ReadAll(req.Body)
+// 	if err != nil {
+// 		return err
+// 	}
+//
+// 	defer req.Body.Close()
+//
+// 	//
+// 	if err := json.Unmarshal(b, v); err != nil {
+// 		return err
+// 	}
+//
+// 	return nil
+// }
 
 // writeBody
 func writeBody(v interface{}, rw http.ResponseWriter, status int) error {
