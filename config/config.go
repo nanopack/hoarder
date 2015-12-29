@@ -26,19 +26,19 @@ const (
 var (
 
 	//  configurable options
-	Backend    = DEFAULT_BACKEND  //
-	Driver     backends.Driver    //
-	GCInterval = 0                //
-	GCAmount   = 0                //
-	Host       = DEFAULT_HOST     //
-	Insecure   = false            //
-	LogLevel   = DEFAULT_LOGLEVEL //
-	Port       = DEFAULT_PORT     //
-	Token      = DEFAULT_TOKEN    //
+	Backend    = DEFAULT_BACKEND  // the pluggable backend the api will use for storage
+	Driver     backends.Driver    // the actual backend driver
+	GCInterval = 0                // the interval between clearning out old storage
+	GCAmount   = 0                // the amount of storage to clear at interval
+	Host       = DEFAULT_HOST     // the connection host
+	Insecure   = false            // connect insecurly
+	LogLevel   = DEFAULT_LOGLEVEL // the output log level
+	Port       = DEFAULT_PORT     // the connection port
+	Token      = DEFAULT_TOKEN    // the secury token used to connect with
 
 	// internal options
-	Addr = Host + Port //
-	Log  lumber.Logger //
+	Addr = Host + Port // the host:port combo for connecting to the server
+	Log  lumber.Logger // the logger to use
 )
 
 //
