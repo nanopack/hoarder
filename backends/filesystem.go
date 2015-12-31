@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const DEFAULT_PATH = "/var/db/hoarder"
+const DEFAULT_FILESYSTEM_PATH = "/var/db/hoarder"
 
 //
 type Filesystem struct {
@@ -19,7 +19,7 @@ func (d Filesystem) init() error {
 
 	//
 	if d.Path == "" {
-		d.Path = DEFAULT_PATH
+		d.Path = DEFAULT_FILESYSTEM_PATH
 	}
 
 	//
