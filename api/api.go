@@ -52,8 +52,6 @@ func setDriver() error {
 		return err
 	}
 
-	fmt.Printf("URL!! %#v\n", u)
-
 	//
 	switch u.Scheme {
 	case "file":
@@ -81,7 +79,7 @@ addition.
 
 // routes registers all api routes with the router
 func routes() *pat.Router {
-	config.Log.Debug("[hoarder/api] Registering routes...\n")
+	config.Log.Debug("Registering routes...\n")
 
 	//
 	router := pat.New()

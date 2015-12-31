@@ -47,7 +47,7 @@ var (
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				fmt.Printf("Starting hoarder server (listening on port %v)...\n", config.Port)
+				fmt.Printf("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
 
 				// start the API
 				if err := api.Start(); err != nil {
