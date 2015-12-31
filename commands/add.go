@@ -38,6 +38,9 @@ var (
 func init() {
 	addCmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
 	addCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
+
+	createCmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
+	createCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
 }
 
 // add
@@ -47,8 +50,10 @@ func add(ccmd *cobra.Command, args []string) {
 	switch {
 	case key == "":
 		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		return
 	case data == "":
 		fmt.Println("Missing data - please provide the data that you would like to create")
+		return
 	}
 
 	//

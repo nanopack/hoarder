@@ -44,12 +44,21 @@ var (
 	}
 )
 
+// init
+func init() {
+	fetchCmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
+	getCmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
+	showCmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
+}
+
 // show
 func show(ccmd *cobra.Command, args []string) {
 
-	//
-	if len(args) <= 0 {
-		fmt.Println("Missing key - please provide the key for the record you'd like to fetch")
+	// handle any missing args
+	switch {
+	case key == "":
+		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		return
 	}
 
 	//

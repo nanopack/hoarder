@@ -44,12 +44,21 @@ var (
 	}
 )
 
+// init
+func init() {
+	deleteCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
+	destroyCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
+	removeCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
+}
+
 // remove
 func remove(ccmd *cobra.Command, args []string) {
 
-	//
-	if len(args) <= 0 {
-		fmt.Println("Missing key - please provide the key for the record you'd like to remove")
+	// handle any missing args
+	switch {
+	case key == "":
+		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		return
 	}
 
 	//
