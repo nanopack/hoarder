@@ -58,6 +58,8 @@ func setDriver() error {
 	switch u.Scheme {
 	case "file":
 		driver = backends.Filesystem{Path: u.Path}
+	// case "scribble":
+	// 	driver = backends.Scribble{Path: u.Path}
 	// case "s3":
 	// 	driver = backends.S3{Path: u.Path}
 	// case "mongo":
