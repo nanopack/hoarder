@@ -23,6 +23,17 @@ var (
 		Run: remove,
 	}
 
+	// alias for remove
+	destroyCmd = &cobra.Command{
+		Hidden: true,
+
+		Use:   "destroy",
+		Short: "Remove a file from hoarder storage",
+		Long:  ``,
+
+		Run: remove,
+	}
+
 	//
 	removeCmd = &cobra.Command{
 		Use:   "remove",

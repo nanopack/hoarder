@@ -87,4 +87,7 @@ func init() {
 	// hidden/aliased commands
 	HoarderCmd.AddCommand(createCmd)
 	HoarderCmd.AddCommand(deleteCmd)
+	HoarderCmd.AddCommand(destroyCmd)
+	HoarderCmd.AddCommand(fetchCmd)
+	HoarderCmd.AddCommand(getCmd)
 }

@@ -10,13 +10,39 @@ import (
 	"github.com/nanopack/hoarder/config"
 )
 
-var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Display a file from the hoarder storage",
-	Long:  ``,
+var (
 
-	Run: show,
-}
+	// alias for show
+	fetchCmd = &cobra.Command{
+		Hidden: true,
+
+		Use:   "fetch",
+		Short: "Display a file from the hoarder storage",
+		Long:  ``,
+
+		Run: remove,
+	}
+
+	// alias for show
+	getCmd = &cobra.Command{
+		Hidden: true,
+
+		Use:   "get",
+		Short: "Display a file from the hoarder storage",
+		Long:  ``,
+
+		Run: remove,
+	}
+
+	//
+	showCmd = &cobra.Command{
+		Use:   "show",
+		Short: "Display a file from the hoarder storage",
+		Long:  ``,
+
+		Run: show,
+	}
+)
 
 // show
 func show(ccmd *cobra.Command, args []string) {
