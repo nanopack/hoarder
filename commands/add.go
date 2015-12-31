@@ -26,7 +26,7 @@ var (
 	createCmd = &cobra.Command{
 		Hidden: true,
 
-		Use:   "add",
+		Use:   "create",
 		Short: "Add file to hoarder storage",
 		Long:  ``,
 
