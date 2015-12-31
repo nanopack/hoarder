@@ -90,12 +90,12 @@ func routes() *pat.Router {
 	})
 
 	// blobs
-	router.Add("HEAD", "/blobs/{blob}", handleRequest(getBlobHead))
-	router.Get("/blobs/{blob}", handleRequest(getBlob))
-	router.Get("/blobs", handleRequest(listBlobs))
-	router.Post("/blobs/{blob}", handleRequest(createBlob))
-	router.Put("/blobs/{blob}", handleRequest(createBlob))
-	router.Delete("/blobs/{blob}", handleRequest(deleteBlob))
+	router.Add("HEAD", "/blobs/{blob}", handleRequest(getHead))
+	router.Get("/blobs/{blob}", handleRequest(get))
+	router.Get("/blobs", handleRequest(list))
+	router.Post("/blobs/{blob}", handleRequest(create))
+	router.Put("/blobs/{blob}", handleRequest(create))
+	router.Delete("/blobs/{blob}", handleRequest(delete))
 
 	return router
 }
@@ -130,7 +130,6 @@ Response:
 // 	if err != nil {
 // 		return err
 // 	}
-//
 // 	defer req.Body.Close()
 //
 // 	//
@@ -142,14 +141,14 @@ Response:
 // }
 
 // writeBody
-func writeBody(v interface{}, rw http.ResponseWriter, status int) error {
+func writeBody(v interface{}, rw http.ResponseWriter) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
 
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(status)
+	// rw.Header().Set("Content-Type", "application/json")
+	// rw.WriteHeader(status)
 	rw.Write(b)
 
 	return nil

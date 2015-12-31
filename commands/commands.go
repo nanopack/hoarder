@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -10,9 +11,15 @@ import (
 )
 
 var (
+
+	//
 	conf    string //
 	server  bool   //
 	version bool   //
+
+	//
+	key  string //
+	data string //
 
 	//
 	HoarderCmd = &cobra.Command{
@@ -28,6 +35,10 @@ var (
 			if conf != "" {
 				config.Parse(conf)
 			}
+
+			// update any dependencies that may need to change due to config values
+			// or flags
+			config.Update()
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending of what flags
@@ -36,7 +47,7 @@ var (
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				config.Log.Info("Starting hoarder server (listening on port %v)...\n", config.Port)
+				fmt.Printf("Starting hoarder server (listening on port %v)...\n", config.Port)
 
 				// start the API
 				if err := api.Start(); err != nil {
@@ -72,4 +83,8 @@ func init() {
 	HoarderCmd.AddCommand(removeCmd)
 	HoarderCmd.AddCommand(showCmd)
 	HoarderCmd.AddCommand(updateCmd)
+
+	// hidden/aliased commands
+	HoarderCmd.AddCommand(createCmd)
+	HoarderCmd.AddCommand(deleteCmd)
 }

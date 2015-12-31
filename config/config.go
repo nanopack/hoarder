@@ -34,9 +34,18 @@ var (
 	Token      = DEFAULT_TOKEN      // the secury token used to connect with
 
 	// internal options
-	Addr = Host + Port // the host:port combo for connecting to the server
-	Log  lumber.Logger // the logger to use
+	Addr = Host + Port       // the host:port connection
+	URI  = "https://" + Addr // the connection URI
+	Log  lumber.Logger       // the logger to use
 )
+
+//
+func init() {
+
+	// create a new logger
+	Log = lumber.NewConsoleLogger(lumber.LvlInt(LogLevel))
+	Log.Prefix("[hoarder]")
+}
 
 //
 func Parse(path string) error {
@@ -92,9 +101,19 @@ func Parse(path string) error {
 		}
 	}
 
-	// create a new logger
-	Log = lumber.NewConsoleLogger(lumber.LvlInt(LogLevel))
-	Log.Prefix("[hoarder]")
-
 	return nil
+}
+
+// Update updates any dependencies that may need to change due to config options
+// or flags
+func Update() {
+
+	//
+	Log.Level(lumber.LvlInt(LogLevel))
+
+	//
+	Addr = Host + Port
+
+	//
+	URI = "https://" + Addr
 }

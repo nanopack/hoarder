@@ -28,10 +28,9 @@ func (d Filesystem) init() error {
 
 // List
 func (d Filesystem) List() ([]FileInfo, error) {
-	d.init()
-
-	//
-	info := []FileInfo{}
+	if err := d.init(); err != nil {
+		return nil, err
+	}
 
 	//
 	files, err := ioutil.ReadDir(d.Path)
@@ -40,16 +39,20 @@ func (d Filesystem) List() ([]FileInfo, error) {
 	}
 
 	//
+	info := []FileInfo{}
 	for _, fi := range files {
 		info = append(info, FileInfo{Name: fi.Name(), Size: fi.Size()})
 	}
 
+	//
 	return info, nil
 }
 
 // Read
 func (d Filesystem) Read(key string) (io.Reader, error) {
-	d.init()
+	if err := d.init(); err != nil {
+		return nil, err
+	}
 
 	//
 	f, err := os.Open(filepath.Join(d.Path, key))
@@ -57,12 +60,15 @@ func (d Filesystem) Read(key string) (io.Reader, error) {
 		return nil, err
 	}
 
+	//
 	return f, nil
 }
 
 // Remove
 func (d Filesystem) Remove(key string) error {
-	d.init()
+	if err := d.init(); err != nil {
+		return err
+	}
 
 	//
 	return os.Remove(filepath.Join(d.Path, key))
@@ -70,29 +76,32 @@ func (d Filesystem) Remove(key string) error {
 
 // Stat
 func (d Filesystem) Stat(key string) (FileInfo, error) {
-	d.init()
+	if err := d.init(); err != nil {
+		return FileInfo{}, err
+	}
 
+	//
 	fi, err := os.Stat(filepath.Join(d.Path, key))
 	if err != nil {
 		return FileInfo{}, err
 	}
 
+	//
 	return FileInfo{Name: fi.Name(), Size: fi.Size()}, nil
 }
 
 // Write
 func (d Filesystem) Write(key string, r io.Reader) error {
-	d.init()
-
-	//
-	b := make([]byte, 2048)
-
-	for {
-
-		//
-		r.Read(b)
-
-		//
-		return ioutil.WriteFile(filepath.Join(d.Path, key), b, 0644)
+	if err := d.init(); err != nil {
+		return err
 	}
+
+	// read the entire contents of the reader
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+
+	// create/truncate a file and write the contents to it
+	return ioutil.WriteFile(filepath.Join(d.Path, key), b, 0644)
 }

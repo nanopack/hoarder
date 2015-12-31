@@ -1,28 +1,90 @@
 package api
 
-import "net/http"
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
 
-//
-func getBlob(rw http.ResponseWriter, req *http.Request) {
-	driver.Read(req.URL.Query().Get(":blob"))
+// get
+func get(rw http.ResponseWriter, req *http.Request) {
+
+	key := req.URL.Query().Get(":blob")
+
+	//
+	r, err := driver.Read(key)
+	if err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	rw.Write(b)
 }
 
-//
-func getBlobHead(rw http.ResponseWriter, req *http.Request) {
-	driver.Stat(req.URL.Query().Get(":blob"))
+// getHead
+func getHead(rw http.ResponseWriter, req *http.Request) {
+
+	key := req.URL.Query().Get(":blob")
+
+	//
+	fi, err := driver.Stat(key)
+	if err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	writeBody(fi, rw)
 }
 
-//
-func createBlob(rw http.ResponseWriter, req *http.Request) {
-	// driver.Write(req.URL.Query().Get(":blob"))
+// create
+func create(rw http.ResponseWriter, req *http.Request) {
+
+	key := req.URL.Query().Get(":blob")
+
+	//
+	if err := driver.Write(key, req.Body); err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	writeBody(fmt.Sprintf("'%s' created!", key), rw)
 }
 
-//
-func deleteBlob(rw http.ResponseWriter, req *http.Request) {
-	driver.Remove(req.URL.Query().Get(":blob"))
+// delete
+func delete(rw http.ResponseWriter, req *http.Request) {
+
+	key := req.URL.Query().Get(":blob")
+
+	//
+	if err := driver.Remove(key); err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	writeBody(fmt.Sprintf("'%s' destroyed!", key), rw)
 }
 
-//
-func listBlobs(rw http.ResponseWriter, req *http.Request) {
-	driver.List()
+// list
+func list(rw http.ResponseWriter, req *http.Request) {
+
+	//
+	fis, err := driver.List()
+	if err != nil {
+		writeBody(err.Error(), rw)
+		return
+	}
+
+	//
+	writeBody(fis, rw)
 }

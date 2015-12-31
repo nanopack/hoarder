@@ -1,9 +1,17 @@
 package main
 
-import "github.com/nanopack/hoarder/commands"
+import (
+	"crypto/tls"
+	"net/http"
+
+	"github.com/nanopack/hoarder/commands"
+)
 
 //
 func main() {
+
+	//
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	//
 	commands.HoarderCmd.Execute()
