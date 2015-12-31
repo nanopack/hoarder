@@ -32,8 +32,10 @@ func update(ccmd *cobra.Command, args []string) {
 	switch {
 	case key == "":
 		fmt.Println("Missing key - please provide the key for the record you'd like to update")
+		return
 	case data == "":
 		fmt.Println("Missing data - please provide the data that you would like to update")
+		return
 	}
 
 	//
