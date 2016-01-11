@@ -57,7 +57,7 @@ func create(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	//
-	writeBody(fmt.Sprintf("'%s' created!", key), rw)
+	rw.Write([]byte(fmt.Sprintf("'%s' created!\n", key)))
 }
 
 // delete
@@ -72,7 +72,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	//
-	writeBody(fmt.Sprintf("'%s' destroyed!", key), rw)
+	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 
 // list

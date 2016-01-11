@@ -39,10 +39,10 @@ func update(ccmd *cobra.Command, args []string) {
 	}
 
 	//
-	body := bytes.NewBuffer([]byte(args[1]))
+	body := bytes.NewBuffer([]byte(data))
 
 	//
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", config.URI, args[0]), body)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", config.URI, key), body)
 	if err != nil {
 		fmt.Println("ERR!!", err)
 	}

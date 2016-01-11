@@ -86,7 +86,7 @@ func routes() *pat.Router {
 
 	//
 	router.Get("/ping", func(rw http.ResponseWriter, req *http.Request) {
-		rw.Write([]byte("pong"))
+		rw.Write([]byte("pong\n"))
 	})
 
 	// blobs

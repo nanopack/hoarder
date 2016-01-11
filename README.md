@@ -40,7 +40,7 @@ Flags:
   -H, --host="0.0.0.0": Hoarder hostname/IP
   -i, --insecure[=false]: Disable tls key checking
       --log-level="info": Hoarder output log level
-  -p, --port=":7410": Hoarder port
+  -p, --port="7410": Hoarder port
       --server[=false]: Run hoader as a server
   -t, --token="TOKEN": Hoarder auth token
   -v, --version[=false]: Display the current version of this CLI
@@ -62,7 +62,7 @@ GCAmount   : 0                    # the amount of storage to clear at interval (
 Host       : 0.0.0.0              # the connection host
 Insecure   : false                # connect insecurly
 LogLevel   : "info"               # the output log level
-Port       : ":7410"              # the connection port
+Port       : "7410"              # the connection port
 Token      : "TOKEN"              # the secury token used to connect with
 ```
 

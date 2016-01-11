@@ -15,7 +15,7 @@ const (
 	DEFAULT_CONNECTION = "file:///var/db/hoarder"
 	DEFAULT_HOST       = "0.0.0.0"
 	DEFAULT_LOGLEVEL   = "info"
-	DEFAULT_PORT       = ":7410"
+	DEFAULT_PORT       = "7410"
 	DEFAULT_TOKEN      = "TOKEN"
 	VERSION            = "0.0.1"
 )
@@ -34,7 +34,7 @@ var (
 	Token      = DEFAULT_TOKEN      // the secury token used to connect with
 
 	// internal options
-	Addr = Host + Port       // the host:port connection
+	Addr = Host + ":" + Port // the host:port connection
 	URI  = "https://" + Addr // the connection URI
 	Log  lumber.Logger       // the logger to use
 )
@@ -106,13 +106,14 @@ func Parse(path string) error {
 
 // Update updates any dependencies that may need to change due to config options
 // or flags
+// Seems to be needed to process any flag specified on the cli
 func Update() {
 
 	//
 	Log.Level(lumber.LvlInt(LogLevel))
 
 	//
-	Addr = Host + Port
+	Addr = Host + ":" + Port
 
 	//
 	URI = "https://" + Addr

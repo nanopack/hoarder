@@ -57,16 +57,18 @@ func add(ccmd *cobra.Command, args []string) {
 	}
 
 	//
-	body := bytes.NewBuffer([]byte(args[1]))
+	body := bytes.NewBuffer([]byte(data))
+	// fmt.Println("body body:   ", body)
+	// fmt.Println("uri  body:   ", fmt.Sprintf("%s/blobs/%s", config.URI, key))
 
 	//
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs", config.URI), body)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs/%s", config.URI, key), body)
 	if err != nil {
 		fmt.Println("ERR!!", err)
 	}
 
 	//
-	req.Header.Add("X-NANOBOX-KEY", args[0])
+	// req.Header.Add("X-NANOBOX-KEY", key)
 	req.Header.Add("X-NANOBOX-TOKEN", config.Token)
 
 	//

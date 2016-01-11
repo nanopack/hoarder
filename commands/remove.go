@@ -62,7 +62,7 @@ func remove(ccmd *cobra.Command, args []string) {
 	}
 
 	//
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/blobs/%s", config.URI, args[0]), nil)
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/blobs/%s", config.URI, key), nil)
 	if err != nil {
 		fmt.Println("ERR!!", err)
 	}
