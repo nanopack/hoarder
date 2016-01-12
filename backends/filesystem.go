@@ -15,8 +15,7 @@ type Filesystem struct {
 }
 
 // init ensures the database exists before trying to do any operations on it
-func (d Filesystem) init() error {
-
+func (d *Filesystem) Init() error {
 	//
 	if d.Path == "" {
 		d.Path = DEFAULT_FILESYSTEM_PATH
@@ -28,10 +27,6 @@ func (d Filesystem) init() error {
 
 // List
 func (d Filesystem) List() ([]FileInfo, error) {
-	if err := d.init(); err != nil {
-		return nil, err
-	}
-
 	//
 	files, err := ioutil.ReadDir(d.Path)
 	if err != nil {
@@ -50,10 +45,6 @@ func (d Filesystem) List() ([]FileInfo, error) {
 
 // Read
 func (d Filesystem) Read(key string) (io.Reader, error) {
-	if err := d.init(); err != nil {
-		return nil, err
-	}
-
 	//
 	f, err := os.Open(filepath.Join(d.Path, key))
 	if err != nil {
@@ -66,20 +57,12 @@ func (d Filesystem) Read(key string) (io.Reader, error) {
 
 // Remove
 func (d Filesystem) Remove(key string) error {
-	if err := d.init(); err != nil {
-		return err
-	}
-
 	//
 	return os.Remove(filepath.Join(d.Path, key))
 }
 
 // Stat
 func (d Filesystem) Stat(key string) (FileInfo, error) {
-	if err := d.init(); err != nil {
-		return FileInfo{}, err
-	}
-
 	//
 	fi, err := os.Stat(filepath.Join(d.Path, key))
 	if err != nil {
@@ -92,10 +75,6 @@ func (d Filesystem) Stat(key string) (FileInfo, error) {
 
 // Write
 func (d Filesystem) Write(key string, r io.Reader) error {
-	if err := d.init(); err != nil {
-		return err
-	}
-
 	// read the entire contents of the reader
 	b, err := ioutil.ReadAll(r)
 	if err != nil {

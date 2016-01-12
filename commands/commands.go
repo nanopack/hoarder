@@ -44,7 +44,7 @@ var (
 			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: config.Insecure}
 		},
 
-		// either run hoarder as a server, or run it as a CLI depending of what flags
+		// either run hoarder as a server, or run it as a CLI depending on what flags
 		// are provided
 		Run: func(ccmd *cobra.Command, args []string) {
 

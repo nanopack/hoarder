@@ -19,6 +19,7 @@ type (
 
 	//
 	Driver interface {
+		Init() error
 		List() ([]backends.FileInfo, error)
 		Read(string) (io.Reader, error)
 		Remove(string) error
@@ -55,7 +56,7 @@ func setDriver() error {
 	//
 	switch u.Scheme {
 	case "file":
-		driver = backends.Filesystem{Path: u.Path}
+		driver = &backends.Filesystem{Path: u.Path}
 	// case "scribble":
 	// 	driver = backends.Scribble{Path: u.Path}
 	// case "s3":
@@ -74,7 +75,7 @@ addition.
 `, u.Scheme)
 	}
 
-	return nil
+	return driver.Init()
 }
 
 // routes registers all api routes with the router

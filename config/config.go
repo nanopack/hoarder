@@ -19,14 +19,14 @@ const (
 var (
 
 	//  configurable options
-	Connection = "file:///var/db/hoarder" // the pluggable backend the api will use for storage
-	GCInterval = 0                  // the interval between clearning out old storage
-	GCAmount   = 0                  // the amount of storage to clear at interval
-	Host       = "127.0.0.1"        // the connection host
-	Insecure   = true               // connect insecurly
-	LogLevel   = "info"             // the output log level
-	Port       = "7410"             // the connection port
-	Token      = "TOKEN"            // the secury token used to connect with
+	Connection = "file://"   // the pluggable backend the api will use for storage
+	GCInterval = 0           // the interval between clearning out old storage
+	GCAmount   = 0           // the amount of storage to clear at interval
+	Host       = "127.0.0.1" // the connection host
+	Insecure   = true        // connect insecurly
+	LogLevel   = "info"      // the output log level
+	Port       = "7410"      // the connection port
+	Token      = "TOKEN"     // the secury token used to connect with
 
 	// internal options
 	Addr = Host + ":" + Port // the host:port connection
