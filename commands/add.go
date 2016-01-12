@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"io/ioutil"
 	"net/http"
 
@@ -75,6 +76,7 @@ func add(ccmd *cobra.Command, args []string) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("ERR!!", err)
+		os.Exit(1)
 	}
 	defer res.Body.Close()
 

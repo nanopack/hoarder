@@ -50,7 +50,7 @@ Use " [command] --help" for more information about a command.
 
 ## Configuration
 
-To configure hoarder a config file can be passed with --config. If no config file
+To configure hoarder, a config file can be passed with --config. If no config file
 is passed reasonable defaults will be used.
 
 ```
@@ -62,7 +62,7 @@ GCAmount   : 0                    # the amount of storage to clear at interval (
 Host       : 0.0.0.0              # the connection host
 Insecure   : false                # connect insecurly
 LogLevel   : "info"               # the output log level
-Port       : "7410"              # the connection port
+Port       : "7410"               # the connection port
 Token      : "TOKEN"              # the secury token used to connect with
 ```
 

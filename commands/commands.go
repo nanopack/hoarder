@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 	"os"
+	"net/http"
+	"crypto/tls"
 
 	"github.com/spf13/cobra"
 
@@ -38,9 +40,8 @@ var (
 				}
 			}
 
-			// update any dependencies that may need to change due to config values
-			// or flags
-			// config.Update()
+			// configure InsecureSkipVerify using setting from 'insecure' flag
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: config.Insecure}
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending of what flags
