@@ -32,12 +32,14 @@ func update(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to update")
+		config.Log.Error("Missing key - please provide the key for the record you'd like to update")
 		return
 	case data == "":
-		fmt.Println("Missing data - please provide the data that you would like to update")
+		config.Log.Error("Missing data - please provide the data that you would like to update")
 		return
 	}
+
+	config.Log.Debug("Updating: %s", fmt.Sprintf("%s/blobs/%s", config.URI, key))
 
 	//
 	body := bytes.NewBuffer([]byte(data))
@@ -45,7 +47,7 @@ func update(ccmd *cobra.Command, args []string) {
 	//
 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", config.URI, key), body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
 	//
@@ -54,7 +56,7 @@ func update(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}
 	defer res.Body.Close()
@@ -62,8 +64,8 @@ func update(ccmd *cobra.Command, args []string) {
 	//
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
-	fmt.Print("UPDATE??", string(b))
+	fmt.Print(string(b))
 }

@@ -22,10 +22,12 @@ var listCmd = &cobra.Command{
 // list
 func list(ccmd *cobra.Command, args []string) {
 
+	config.Log.Debug("Listing: %s", fmt.Sprintf("%s/blobs", config.URI))
+
 	//
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs", config.URI), nil)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
 	//
@@ -34,7 +36,7 @@ func list(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}
 	defer res.Body.Close()
@@ -42,8 +44,8 @@ func list(ccmd *cobra.Command, args []string) {
 	//
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
-	fmt.Print("LIST??", string(b))
+	fmt.Print(string(b))
 }

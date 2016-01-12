@@ -35,14 +35,6 @@ var (
 )
 
 //
-func init() {
-
-	// create a new logger
-	Log = lumber.NewConsoleLogger(lumber.LvlInt(LogLevel))
-	Log.Prefix("[hoarder]")
-}
-
-//
 func Parse(path string) error {
 
 	// if a config is provided (and found), parse the config file overwriting any
@@ -58,7 +50,6 @@ func Parse(path string) error {
 		// parse config file
 		options := make(map[string]string)
 		if err := yaml.Unmarshal(f, &options); err != nil {
-			// fmt.Printf("Failed to parse config file: '%s'!\n", fp)
 			return err
 		}
 

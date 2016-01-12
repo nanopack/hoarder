@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"fmt"
 	"os"
 	"net/http"
 	"crypto/tls"
 
 	"github.com/spf13/cobra"
+	"github.com/jcelliott/lumber"
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/config"
@@ -32,11 +32,15 @@ var (
 		// parse the config if one is provided, or use the defaults. Set the backend
 		// driver to be used
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
+			// create a new logger
+			config.Log = lumber.NewConsoleLogger(lumber.LvlInt(config.LogLevel))
+			config.Log.Prefix("[hoarder]")
+
 
 			// if --config is passed, attempt to parse the config file
 			if conf != "" {
 				if err := config.Parse(conf); err != nil {
-					config.Log.Error("Failed to parse config - ", err.Error())
+					config.Log.Error("Failed to parse config '%s' - %s", conf, err.Error())
 				}
 			}
 
@@ -50,11 +54,11 @@ var (
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				fmt.Printf("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
+				config.Log.Info("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
 
 				// start the API
 				if err := api.Start(); err != nil {
-					config.Log.Error("Failed to start - ", err.Error())
+					config.Log.Fatal("Failed to start - %s", err.Error())
 					os.Exit(1)
 				}
 			}

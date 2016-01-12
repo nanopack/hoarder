@@ -36,7 +36,7 @@ func Start() error {
 
 	//
 	if err := setDriver(); err != nil {
-		fmt.Println("BONK!", err)
+		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}
 
@@ -106,7 +106,7 @@ func routes() *pat.Router {
 func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 
-		config.Log.Debug(`
+		config.Log.Trace(`
 Request:
 --------------------------------------------------------------------------------
 %+v
@@ -115,7 +115,7 @@ Request:
 		//
 		fn(rw, req)
 
-		config.Log.Debug(`
+		config.Log.Trace(`
 Response:
 --------------------------------------------------------------------------------
 %+v
