@@ -70,7 +70,7 @@ func init() {
 	// persistent flags
 	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
-	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", false, "Disable tls key checking")
+	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", true, "Disable tls key checking")
 	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.Port, "Hoarder port")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.Token, "Hoarder auth token")

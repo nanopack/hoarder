@@ -37,8 +37,8 @@ Available Commands:
 Flags:
   -b, --backend="filesystem": Hoarder backend driver
       --config="": Path to config options
-  -H, --host="0.0.0.0": Hoarder hostname/IP
-  -i, --insecure[=false]: Disable tls key checking
+  -H, --host="127.0.0.1": Hoarder hostname/IP
+  -i, --insecure[=true]: Disable tls key checking
       --log-level="info": Hoarder output log level
   -p, --port="7410": Hoarder port
       --server[=false]: Run hoader as a server
@@ -59,8 +59,8 @@ Backend    : "filesystem"         # the pluggable backend the api will use for s
 Driver     : backends.Filesystem  # the actual backend driver
 GCInterval : 0                    # the interval between clearning out old storage (disabled by default)
 GCAmount   : 0                    # the amount of storage to clear at interval (disabled by default)
-Host       : 0.0.0.0              # the connection host
-Insecure   : false                # connect insecurly
+Host       : 127.0.0.1            # the connection host
+Insecure   : true                 # connect insecurly
 LogLevel   : "info"               # the output log level
 Port       : "7410"               # the connection port
 Token      : "TOKEN"              # the secury token used to connect with
