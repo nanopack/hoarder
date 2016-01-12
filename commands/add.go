@@ -84,5 +84,5 @@ func add(ccmd *cobra.Command, args []string) {
 		fmt.Println("ERR!!", err)
 	}
 
-	fmt.Println("ADD??", string(b))
+	fmt.Print("ADD??", string(b))
 }

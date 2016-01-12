@@ -43,5 +43,5 @@ func list(ccmd *cobra.Command, args []string) {
 		fmt.Println("ERR!!", err)
 	}
 
-	fmt.Println("LIST??", string(b))
+	fmt.Print("LIST??", string(b))
 }

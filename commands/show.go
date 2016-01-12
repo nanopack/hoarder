@@ -83,5 +83,5 @@ func show(ccmd *cobra.Command, args []string) {
 		fmt.Println("ERR!!", err)
 	}
 
-	fmt.Println("SHOW??", string(b))
+	fmt.Print("SHOW??", string(b))
 }

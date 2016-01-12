@@ -12,11 +12,6 @@ import (
 
 //
 const (
-	DEFAULT_CONNECTION = "file:///var/db/hoarder"
-	DEFAULT_HOST       = "0.0.0.0"
-	DEFAULT_LOGLEVEL   = "info"
-	DEFAULT_PORT       = "7410"
-	DEFAULT_TOKEN      = "TOKEN"
 	VERSION            = "0.0.1"
 )
 
@@ -24,14 +19,14 @@ const (
 var (
 
 	//  configurable options
-	Connection = DEFAULT_CONNECTION // the pluggable backend the api will use for storage
+	Connection = "file:///var/db/hoarder" // the pluggable backend the api will use for storage
 	GCInterval = 0                  // the interval between clearning out old storage
 	GCAmount   = 0                  // the amount of storage to clear at interval
-	Host       = DEFAULT_HOST       // the connection host
+	Host       = "0.0.0.0"          // the connection host
 	Insecure   = false              // connect insecurly
-	LogLevel   = DEFAULT_LOGLEVEL   // the output log level
-	Port       = DEFAULT_PORT       // the connection port
-	Token      = DEFAULT_TOKEN      // the secury token used to connect with
+	LogLevel   = "info"             // the output log level
+	Port       = "7410"             // the connection port
+	Token      = "TOKEN"            // the secury token used to connect with
 
 	// internal options
 	Addr = Host + ":" + Port // the host:port connection
@@ -61,8 +56,9 @@ func Parse(path string) error {
 		}
 
 		// parse config file
-		options := map[string]string{}
-		if err := yaml.Unmarshal(f, options); err != nil {
+		options := make(map[string]string)
+		if err := yaml.Unmarshal(f, &options); err != nil {
+			// fmt.Printf("Failed to parse config file: '%s'!\n", fp)
 			return err
 		}
 
@@ -102,19 +98,4 @@ func Parse(path string) error {
 	}
 
 	return nil
-}
-
-// Update updates any dependencies that may need to change due to config options
-// or flags
-// Seems to be needed to process any flag specified on the cli
-func Update() {
-
-	//
-	Log.Level(lumber.LvlInt(LogLevel))
-
-	//
-	Addr = Host + ":" + Port
-
-	//
-	URI = "https://" + Addr
 }

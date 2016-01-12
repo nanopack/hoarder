@@ -63,5 +63,5 @@ func update(ccmd *cobra.Command, args []string) {
 		fmt.Println("ERR!!", err)
 	}
 
-	fmt.Println("UPDATE??", string(b))
+	fmt.Print("UPDATE??", string(b))
 }

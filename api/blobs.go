@@ -72,6 +72,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	//
+	// writeBody(fmt.Sprintf("'%s' destroyed!\n", key), rw)
 	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 

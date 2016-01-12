@@ -83,5 +83,5 @@ func remove(ccmd *cobra.Command, args []string) {
 		fmt.Println("ERR!!", err)
 	}
 
-	fmt.Println("REMOVE??", string(b))
+	fmt.Print("REMOVE??", string(b))
 }

@@ -33,12 +33,14 @@ var (
 
 			// if --config is passed, attempt to parse the config file
 			if conf != "" {
-				config.Parse(conf)
+				if err := config.Parse(conf); err != nil {
+					config.Log.Error("Failed to parse config - ", err.Error())
+				}
 			}
 
 			// update any dependencies that may need to change due to config values
 			// or flags
-			config.Update()
+			// config.Update()
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending of what flags
@@ -65,12 +67,12 @@ var (
 func init() {
 
 	// persistent flags
-	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.DEFAULT_CONNECTION, "Hoarder backend driver")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.DEFAULT_HOST, "Hoarder hostname/IP")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
 	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", false, "Disable tls key checking")
-	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.DEFAULT_LOGLEVEL, "Hoarder output log level")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.DEFAULT_PORT, "Hoarder port")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.DEFAULT_TOKEN, "Hoarder auth token")
+	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.Port, "Hoarder port")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.Token, "Hoarder auth token")
 
 	// local flags
 	HoarderCmd.Flags().StringVarP(&conf, "config", "", "", "Path to config options")
