@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // get
@@ -41,8 +42,10 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// set useful content-length
+	// set useful headers
 	rw.Header().Set("Content-Length", fmt.Sprintf("%d", fi.Size))
+	rw.Header().Set("Last-Modified", fi.ModTime.Format(time.RFC1123))
+	rw.Header().Set("Date", time.Now().UTC().Format(time.RFC1123))
 
 	//
 	writeBody(nil, rw)

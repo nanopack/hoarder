@@ -2,12 +2,14 @@ package backends
 
 import (
 	"errors"
+	"time"
 )
 
 //
 type FileInfo struct {
 	Name string
 	Size int64
+	ModTime time.Time
 }
 
 // errors
