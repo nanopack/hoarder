@@ -113,16 +113,16 @@ func TestHeadData(t *testing.T) {
 	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
 
 	res, err := http.DefaultClient.Do(req)
+
 	if err != nil {
-		t.Error("Unable to SHOW data - ", err)
+		t.Error("Unable to HEAD data - ", err)
 		return
 	}
 	defer res.Body.Close()
 
-	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
-	if string(b) != "data" {
-		t.Errorf("%q doesn't match expected out", b)
+	length := res.Header.Get("Content-Length")
+	if length != "4" {
+		t.Errorf("%q doesn't match expected length", length)
 	}
 }
 

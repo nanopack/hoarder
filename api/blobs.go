@@ -41,8 +41,11 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// set useful content-length
+	rw.Header().Set("Content-Length", fmt.Sprintf("%d", fi.Size))
+
 	//
-	writeBody(fi, rw)
+	writeBody(nil, rw)
 }
 
 // create
@@ -72,7 +75,6 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	//
-	// writeBody(fmt.Sprintf("'%s' destroyed!\n", key), rw)
 	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 

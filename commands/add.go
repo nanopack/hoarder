@@ -68,8 +68,6 @@ func add(ccmd *cobra.Command, args []string) {
 		config.Log.Error(err.Error())
 	}
 
-	//
-	// req.Header.Add("X-NANOBOX-KEY", key)
 	req.Header.Add("X-NANOBOX-TOKEN", config.Token)
 
 	//
