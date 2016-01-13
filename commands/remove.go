@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"io/ioutil"
 	"net/http"
 
@@ -57,14 +58,16 @@ func remove(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		config.Log.Error("Missing key - please provide the key for the record you'd like to create")
 		return
 	}
 
+	config.Log.Debug("Removing: %s", fmt.Sprintf("%s/blobs/%s", config.URI, key))
+
 	//
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/blobs/%s", config.URI, args[0]), nil)
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/blobs/%s", config.URI, key), nil)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
 	//
@@ -73,15 +76,16 @@ func remove(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Fatal(err.Error())
+		os.Exit(1)
 	}
 	defer res.Body.Close()
 
 	//
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
-	fmt.Println("REMOVE??", string(b))
+	fmt.Print(string(b))
 }

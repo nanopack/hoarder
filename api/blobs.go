@@ -14,14 +14,14 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	//
 	r, err := driver.Read(key)
 	if err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
 	//
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
@@ -37,12 +37,15 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 	//
 	fi, err := driver.Stat(key)
 	if err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
+	// set useful content-length
+	rw.Header().Set("Content-Length", fmt.Sprintf("%d", fi.Size))
+
 	//
-	writeBody(fi, rw)
+	writeBody(nil, rw)
 }
 
 // create
@@ -52,12 +55,12 @@ func create(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	if err := driver.Write(key, req.Body); err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
 	//
-	writeBody(fmt.Sprintf("'%s' created!", key), rw)
+	rw.Write([]byte(fmt.Sprintf("'%s' created!\n", key)))
 }
 
 // delete
@@ -67,12 +70,12 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	if err := driver.Remove(key); err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
 	//
-	writeBody(fmt.Sprintf("'%s' destroyed!", key), rw)
+	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 
 // list
@@ -81,7 +84,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 	//
 	fis, err := driver.List()
 	if err != nil {
-		writeBody(err.Error(), rw)
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 

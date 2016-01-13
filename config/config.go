@@ -12,40 +12,27 @@ import (
 
 //
 const (
-	DEFAULT_CONNECTION = "file:///var/db/hoarder"
-	DEFAULT_HOST       = "0.0.0.0"
-	DEFAULT_LOGLEVEL   = "info"
-	DEFAULT_PORT       = ":7410"
-	DEFAULT_TOKEN      = "TOKEN"
-	VERSION            = "0.0.1"
+	VERSION = "0.0.1"
 )
 
 //
 var (
 
 	//  configurable options
-	Connection = DEFAULT_CONNECTION // the pluggable backend the api will use for storage
-	GCInterval = 0                  // the interval between clearning out old storage
-	GCAmount   = 0                  // the amount of storage to clear at interval
-	Host       = DEFAULT_HOST       // the connection host
-	Insecure   = false              // connect insecurly
-	LogLevel   = DEFAULT_LOGLEVEL   // the output log level
-	Port       = DEFAULT_PORT       // the connection port
-	Token      = DEFAULT_TOKEN      // the secury token used to connect with
+	Connection = "file://"   // the pluggable backend the api will use for storage
+	GCInterval = 0           // the interval between clearning out old storage
+	GCAmount   = 0           // the amount of storage to clear at interval
+	Host       = "127.0.0.1" // the connection host
+	Insecure   = true        // connect insecurly
+	LogLevel   = "info"      // the output log level
+	Port       = "7410"      // the connection port
+	Token      = "TOKEN"     // the secury token used to connect with
 
 	// internal options
-	Addr = Host + Port       // the host:port connection
+	Addr = Host + ":" + Port // the host:port connection
 	URI  = "https://" + Addr // the connection URI
 	Log  lumber.Logger       // the logger to use
 )
-
-//
-func init() {
-
-	// create a new logger
-	Log = lumber.NewConsoleLogger(lumber.LvlInt(LogLevel))
-	Log.Prefix("[hoarder]")
-}
 
 //
 func Parse(path string) error {
@@ -61,8 +48,8 @@ func Parse(path string) error {
 		}
 
 		// parse config file
-		options := map[string]string{}
-		if err := yaml.Unmarshal(f, options); err != nil {
+		options := make(map[string]string)
+		if err := yaml.Unmarshal(f, &options); err != nil {
 			return err
 		}
 
@@ -102,18 +89,4 @@ func Parse(path string) error {
 	}
 
 	return nil
-}
-
-// Update updates any dependencies that may need to change due to config options
-// or flags
-func Update() {
-
-	//
-	Log.Level(lumber.LvlInt(LogLevel))
-
-	//
-	Addr = Host + Port
-
-	//
-	URI = "https://" + Addr
 }

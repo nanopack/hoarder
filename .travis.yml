@@ -4,3 +4,5 @@ go:
   - 1.5
 
 go_import_path: github.com/nanopack/hoarder
+install: go get -t -v .
+script: go test -v ./...

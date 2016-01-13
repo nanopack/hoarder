@@ -19,6 +19,7 @@ type (
 
 	//
 	Driver interface {
+		Init() error
 		List() ([]backends.FileInfo, error)
 		Read(string) (io.Reader, error)
 		Remove(string) error
@@ -35,7 +36,7 @@ func Start() error {
 
 	//
 	if err := setDriver(); err != nil {
-		fmt.Println("BONK!", err)
+		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}
 
@@ -55,7 +56,7 @@ func setDriver() error {
 	//
 	switch u.Scheme {
 	case "file":
-		driver = backends.Filesystem{Path: u.Path}
+		driver = &backends.Filesystem{Path: u.Path}
 	// case "scribble":
 	// 	driver = backends.Scribble{Path: u.Path}
 	// case "s3":
@@ -74,7 +75,7 @@ addition.
 `, u.Scheme)
 	}
 
-	return nil
+	return driver.Init()
 }
 
 // routes registers all api routes with the router
@@ -86,7 +87,7 @@ func routes() *pat.Router {
 
 	//
 	router.Get("/ping", func(rw http.ResponseWriter, req *http.Request) {
-		rw.Write([]byte("pong"))
+		rw.Write([]byte("pong\n"))
 	})
 
 	// blobs
@@ -105,7 +106,7 @@ func routes() *pat.Router {
 func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 
-		config.Log.Debug(`
+		config.Log.Trace(`
 Request:
 --------------------------------------------------------------------------------
 %+v
@@ -114,7 +115,7 @@ Request:
 		//
 		fn(rw, req)
 
-		config.Log.Debug(`
+		config.Log.Trace(`
 Response:
 --------------------------------------------------------------------------------
 %+v

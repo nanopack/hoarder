@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"io/ioutil"
 	"net/http"
 
@@ -49,38 +50,39 @@ func add(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		config.Log.Error("Missing key - please provide the key for the record you'd like to create")
 		return
 	case data == "":
-		fmt.Println("Missing data - please provide the data that you would like to create")
+		config.Log.Error("Missing data - please provide the data that you would like to create")
 		return
 	}
 
-	//
-	body := bytes.NewBuffer([]byte(args[1]))
+	config.Log.Debug("Adding: %s", fmt.Sprintf("%s/blobs/%s", config.URI, key))
 
 	//
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs", config.URI), body)
+	body := bytes.NewBuffer([]byte(data))
+
+	//
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs/%s", config.URI, key), body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
-	//
-	req.Header.Add("X-NANOBOX-KEY", args[0])
 	req.Header.Add("X-NANOBOX-TOKEN", config.Token)
 
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Fatal(err.Error())
+		os.Exit(1)
 	}
 	defer res.Body.Close()
 
 	//
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("ERR!!", err)
+		config.Log.Error(err.Error())
 	}
 
-	fmt.Println("ADD??", string(b))
+	fmt.Print(string(b))
 }

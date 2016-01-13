@@ -1,10 +1,12 @@
 package commands
 
 import (
-	"fmt"
 	"os"
+	"net/http"
+	"crypto/tls"
 
 	"github.com/spf13/cobra"
+	"github.com/jcelliott/lumber"
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/config"
@@ -30,28 +32,33 @@ var (
 		// parse the config if one is provided, or use the defaults. Set the backend
 		// driver to be used
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
+			// create a new logger
+			config.Log = lumber.NewConsoleLogger(lumber.LvlInt(config.LogLevel))
+			config.Log.Prefix("[hoarder]")
+
 
 			// if --config is passed, attempt to parse the config file
 			if conf != "" {
-				config.Parse(conf)
+				if err := config.Parse(conf); err != nil {
+					config.Log.Error("Failed to parse config '%s' - %s", conf, err.Error())
+				}
 			}
 
-			// update any dependencies that may need to change due to config values
-			// or flags
-			config.Update()
+			// configure InsecureSkipVerify using setting from 'insecure' flag
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: config.Insecure}
 		},
 
-		// either run hoarder as a server, or run it as a CLI depending of what flags
+		// either run hoarder as a server, or run it as a CLI depending on what flags
 		// are provided
 		Run: func(ccmd *cobra.Command, args []string) {
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				fmt.Printf("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
+				config.Log.Info("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
 
 				// start the API
 				if err := api.Start(); err != nil {
-					config.Log.Error("Failed to start - ", err.Error())
+					config.Log.Fatal("Failed to start - %s", err.Error())
 					os.Exit(1)
 				}
 			}
@@ -65,12 +72,12 @@ var (
 func init() {
 
 	// persistent flags
-	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.DEFAULT_CONNECTION, "Hoarder backend driver")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.DEFAULT_HOST, "Hoarder hostname/IP")
-	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", false, "Disable tls key checking")
-	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.DEFAULT_LOGLEVEL, "Hoarder output log level")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.DEFAULT_PORT, "Hoarder port")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.DEFAULT_TOKEN, "Hoarder auth token")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
+	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", true, "Disable tls key checking")
+	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.Port, "Hoarder port")
+	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.Token, "Hoarder auth token")
 
 	// local flags
 	HoarderCmd.Flags().StringVarP(&conf, "config", "", "", "Path to config options")
