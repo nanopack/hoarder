@@ -1,4 +1,4 @@
-package main_test
+package api_test
 
 import (
 	"bytes"
@@ -12,8 +12,8 @@ import (
 
 	"github.com/jcelliott/lumber"
 
-	"github.com/nanopack/hoarder/config"
 	"github.com/nanopack/hoarder/api"
+	"github.com/nanopack/hoarder/config"
 )
 
 func TestMain(m *testing.M) {
@@ -89,6 +89,27 @@ func TestShowData(t *testing.T) {
 	key:= "test"
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("https://%s/blobs/%s", config.Addr, key), nil)
+	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Error("Unable to SHOW data - ", err)
+		return
+	}
+	defer res.Body.Close()
+
+	b, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(b)
+	if string(b) != "data" {
+		t.Errorf("%q doesn't match expected out", b)
+	}
+}
+
+// test heading data
+func TestHeadData(t *testing.T) {
+	key:= "test"
+
+	req, _ := http.NewRequest("HEAD", fmt.Sprintf("https://%s/blobs/%s", config.Addr, key), nil)
 	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
 
 	res, err := http.DefaultClient.Do(req)

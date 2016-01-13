@@ -58,7 +58,7 @@ func (d Filesystem) Read(key string) (io.Reader, error) {
 // Remove
 func (d Filesystem) Remove(key string) error {
 	//
-	return os.Remove(filepath.Join(d.Path, key))
+	return os.RemoveAll(filepath.Join(d.Path, key))
 }
 
 // Stat
