@@ -2,9 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 

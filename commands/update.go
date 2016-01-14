@@ -3,9 +3,9 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 

@@ -18,22 +18,21 @@ const (
 
 //
 var (
-
-	//  configurable options
-	Connection = "file://"   // the pluggable backend the api will use for storage
+	// configurable options
 	// time.Now().Unix() ensures safety if a config file is used to turn on gc
 	CleanAfter = uint64(time.Now().Unix()) // the age that data is deemed garbage (seconds)
-	Host       = "127.0.0.1" // the connection host
-	Insecure   = true        // connect insecurly
-	LogLevel   = "info"      // the output log level
-	Port       = "7410"      // the connection port
-	Token      = "TOKEN"     // the secury token used to connect with
+	Connection = "file://"                 // the pluggable backend the api will use for storage
+	Host       = "127.0.0.1"               // the connection host
+	Insecure   = true                      // connect insecurly
+	LogLevel   = "info"                    // the output log level
+	Port       = "7410"                    // the connection port
+	Token      = "TOKEN"                   // the secury token used to connect with
 
 	// internal options
-	GarbageCollect = false   // to clean or not to clean
-	Addr = Host + ":" + Port // the host:port connection
-	URI  = "https://" + Addr // the connection URI
-	Log  lumber.Logger       // the logger to use
+	GarbageCollect = false             // to clean or not to clean
+	Addr           = Host + ":" + Port // the host:port connection
+	URI            = "https://" + Addr // the connection URI
+	Log            lumber.Logger       // the logger to use
 )
 
 //

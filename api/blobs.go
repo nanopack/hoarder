@@ -91,6 +91,8 @@ func list(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	rw.Header().Set("Content-Type", "application/json")
+
 	//
 	writeBody(fis, rw)
 }

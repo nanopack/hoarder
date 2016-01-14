@@ -7,9 +7,9 @@ import (
 
 //
 type FileInfo struct {
-	Name string
-	Size int64
-	ModTime time.Time
+	Name    string    `json:"Name"`
+	Size    int64     `json:"Size"`
+	ModTime time.Time `json:"ModTime"`
 }
 
 // errors

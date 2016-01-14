@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"os"
-	"net/http"
 	"crypto/tls"
+	"net/http"
+	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/jcelliott/lumber"
+	"github.com/spf13/cobra"
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/config"
@@ -35,7 +35,6 @@ var (
 			// create a new logger
 			config.Log = lumber.NewConsoleLogger(lumber.LvlInt(config.LogLevel))
 			config.Log.Prefix("[hoarder]")
-
 
 			// if --config is passed, attempt to parse the config file
 			if conf != "" {

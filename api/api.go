@@ -112,14 +112,14 @@ func routes() *pat.Router {
 func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 
-    fn(rw, req)
+		fn(rw, req)
 
-    // must be after fn if ever going to get rw.status (logging still more meaningful)
-    config.Log.Trace(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "X-Nanobox-Token: %s"`,
-      req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
-      rw.Header().Get("status"), req.Header.Get("Content-Length"),
-      req.Header.Get("User-Agent"), req.Header.Get("X-Nanobox-Token"))
-  }
+		// must be after fn if ever going to get rw.status (logging still more meaningful)
+		config.Log.Trace(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "X-Nanobox-Token: %s"`,
+			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
+			rw.Header().Get("status"), req.Header.Get("Content-Length"),
+			req.Header.Get("User-Agent"), req.Header.Get("X-Nanobox-Token"))
+	}
 }
 
 // writeBody

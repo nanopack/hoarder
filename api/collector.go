@@ -10,8 +10,8 @@ import (
 
 const CLEAN_FREQ = 10
 
-func removeOldKeys() error{
-	if ! config.GarbageCollect {
+func removeOldKeys() error {
+	if !config.GarbageCollect {
 		return errors.New("Garbage collection not 'on' but cleanup called! Killing GC")
 	}
 	datas, err := driver.List()
