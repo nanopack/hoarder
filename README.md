@@ -57,7 +57,6 @@ is passed reasonable defaults will be used.
 ```
 # following are all the available configuration file options (all default values are shown)
 clean_after : 0                    # the age that data is deemed garbage (seconds)
-collect     : false                # required to enable garbage collector from config file
 connection  : "file://"            # the pluggable backend the api will use for storage
 host        : 127.0.0.1            # the connection host
 insecure    : true                 # connect insecurly

@@ -42,7 +42,7 @@ func Start() error {
 
 	// start garbage collector
 	if config.GarbageCollect {
-		config.Log.Debug("Starting garbage collector (data older than %ds)...", config.CleanAfter)
+		config.Log.Debug("Starting garbage collector (data older than %ds)...", config.CleanAfter.Value)
 		go startCollection()
 	}
 

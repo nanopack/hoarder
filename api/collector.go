@@ -23,7 +23,7 @@ func removeOldKeys() error {
 
 	config.Log.Trace("Garbage Collector - Finding files...")
 	for _, data := range datas {
-		if data.ModTime.Unix() < (now.Unix() - int64(config.CleanAfter)) {
+		if data.ModTime.Unix() < (now.Unix() - int64(config.CleanAfter.Value)) {
 			config.Log.Debug("Cleaning key: %s", data.Name)
 			if err := driver.Remove(data.Name); err != nil {
 				return errors.New(fmt.Sprintf("Cleaning of '%s' failed - ", data.Name, err.Error()))

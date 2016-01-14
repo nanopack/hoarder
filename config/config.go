@@ -16,17 +16,22 @@ const (
 	VERSION = "0.0.1"
 )
 
+type ConfigUint64Var struct {
+	Value   uint64
+	Changed bool
+}
+
 //
 var (
 	// configurable options
 	// time.Now().Unix() ensures safety if a config file is used to turn on gc
-	CleanAfter = uint64(time.Now().Unix()) // the age that data is deemed garbage (seconds)
-	Connection = "file://"                 // the pluggable backend the api will use for storage
-	Host       = "127.0.0.1"               // the connection host
-	Insecure   = true                      // connect insecurly
-	LogLevel   = "info"                    // the output log level
-	Port       = "7410"                    // the connection port
-	Token      = "TOKEN"                   // the secury token used to connect with
+	CleanAfter = ConfigUint64Var{uint64(time.Now().Unix()), false} // the age that data is deemed garbage (seconds)
+	Connection = "file://"                                         // the pluggable backend the api will use for storage
+	Host       = "127.0.0.1"                                       // the connection host
+	Insecure   = true                                              // connect insecurly
+	LogLevel   = "info"                                            // the output log level
+	Port       = "7410"                                            // the connection port
+	Token      = "TOKEN"                                           // the secury token used to connect with
 
 	// internal options
 	GarbageCollect = false             // to clean or not to clean
@@ -58,17 +63,12 @@ func Parse(path string) error {
 		for k, v := range options {
 			switch k {
 			case "clean_after":
-				i, err := strconv.Atoi(v)
+				i, err := strconv.ParseUint(v, 0, 64)
 				if err != nil {
 					return err
 				}
-				CleanAfter = uint64(i)
-			case "collect":
-				b, err := strconv.ParseBool(v)
-				if err != nil {
-					return err
-				}
-				GarbageCollect = b
+				CleanAfter.Value = i
+				CleanAfter.Changed = true
 			case "connection":
 				Connection = v
 			case "host":
