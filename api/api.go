@@ -100,6 +100,7 @@ func routes() *pat.Router {
 	router.Add("HEAD", "/blobs/{blob}", handleRequest(getHead))
 	router.Get("/blobs/{blob}", handleRequest(get))
 	router.Get("/blobs", handleRequest(list))
+	router.Add("HEAD", "/blobs", handleRequest(list))
 	router.Post("/blobs/{blob}", handleRequest(create))
 	router.Put("/blobs/{blob}", handleRequest(create))
 	router.Delete("/blobs/{blob}", handleRequest(delete))
