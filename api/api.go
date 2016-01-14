@@ -40,6 +40,12 @@ func Start() error {
 		os.Exit(1)
 	}
 
+	// start garbage collector
+	if config.GarbageCollect {
+		config.Log.Debug("Starting garbage collector (data older than %ds)...", config.CleanAfter.Value)
+		go startCollection()
+	}
+
 	// blocking...
 	return nanoauth.ListenAndServeTLS(config.Addr, config.Token, routes())
 }
@@ -94,6 +100,7 @@ func routes() *pat.Router {
 	router.Add("HEAD", "/blobs/{blob}", handleRequest(getHead))
 	router.Get("/blobs/{blob}", handleRequest(get))
 	router.Get("/blobs", handleRequest(list))
+	router.Add("HEAD", "/blobs", handleRequest(list))
 	router.Post("/blobs/{blob}", handleRequest(create))
 	router.Put("/blobs/{blob}", handleRequest(create))
 	router.Delete("/blobs/{blob}", handleRequest(delete))
@@ -106,40 +113,15 @@ func routes() *pat.Router {
 func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 
-		config.Log.Trace(`
-Request:
---------------------------------------------------------------------------------
-%+v
-`, req)
-
-		//
 		fn(rw, req)
 
-		config.Log.Trace(`
-Response:
---------------------------------------------------------------------------------
-%+v
-`, rw)
+		// must be after fn if ever going to get rw.status (logging still more meaningful)
+		config.Log.Trace(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "X-Nanobox-Token: %s"`,
+			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
+			rw.Header().Get("status"), req.Header.Get("Content-Length"),
+			req.Header.Get("User-Agent"), req.Header.Get("X-Nanobox-Token"))
 	}
 }
-
-// parseBody
-// func parseBody(req *http.Request, v interface{}) error {
-//
-// 	//
-// 	b, err := ioutil.ReadAll(req.Body)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer req.Body.Close()
-//
-// 	//
-// 	if err := json.Unmarshal(b, v); err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
 
 // writeBody
 func writeBody(v interface{}, rw http.ResponseWriter) error {
@@ -148,8 +130,6 @@ func writeBody(v interface{}, rw http.ResponseWriter) error {
 		return err
 	}
 
-	// rw.Header().Set("Content-Type", "application/json")
-	// rw.WriteHeader(status)
 	rw.Write(b)
 
 	return nil

@@ -37,6 +37,7 @@ Available Commands:
 Flags:
   -b, --backend="filesystem": Hoarder backend driver
       --config="": Path to config options
+  -g, --clean-after="0": Age data is deemed garbage (seconds)
   -H, --host="127.0.0.1": Hoarder hostname/IP
   -i, --insecure[=true]: Disable tls key checking
       --log-level="info": Hoarder output log level
@@ -54,16 +55,14 @@ To configure hoarder, a config file can be passed with --config. If no config fi
 is passed reasonable defaults will be used.
 
 ```
-# following are all the available configuration options (all default values are shown)
-Backend    : "filesystem"         # the pluggable backend the api will use for storage
-Driver     : backends.Filesystem  # the actual backend driver
-GCInterval : 0                    # the interval between clearning out old storage (disabled by default)
-GCAmount   : 0                    # the amount of storage to clear at interval (disabled by default)
-Host       : 127.0.0.1            # the connection host
-Insecure   : true                 # connect insecurly
-LogLevel   : "info"               # the output log level
-Port       : "7410"               # the connection port
-Token      : "TOKEN"              # the secury token used to connect with
+# following are all the available configuration file options (all default values are shown)
+clean_after : 0                    # the age that data is deemed garbage (seconds)
+connection  : "file://"            # the pluggable backend the api will use for storage
+host        : 127.0.0.1            # the connection host
+insecure    : true                 # connect insecurly
+log_level   : "info"               # the output log level
+port        : "7410"               # the connection port
+token       : "TOKEN"              # the secury token used to connect with
 ```
 
 ## Routes:
@@ -74,14 +73,10 @@ Token      : "TOKEN"              # the secury token used to connect with
 | HEAD   | /blobs/{blob} | Retrieve file information about a blob
 | GET    | /blobs/{blob} | Retrieve a blob
 | GET    | /blobs"       | List all blobs
-| POST   | /blobs/{blob} | Publish a New blob
+| POST   | /blobs/{blob} | Publish a new blob
 | PUT    | /blobs/{blob} | Update an existing blob
-| Delete | /blobs/{blob} | Remove a existing blob
+| DELETE | /blobs/{blob} | Remove an existing blob
 ```
-
-## Todo
-
-- tests
 
 ### Contributing
 

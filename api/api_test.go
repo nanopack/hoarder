@@ -3,6 +3,7 @@ package api_test
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -55,7 +56,6 @@ func TestAddData(t *testing.T) {
 	defer res.Body.Close()
 
 	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
 	if string(b) != "'test' created!\n" {
 		t.Errorf("%q doesn't match expected out", b)
 	}
@@ -78,7 +78,6 @@ func TestUpdateData(t *testing.T) {
 	defer res.Body.Close()
 
 	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
 	if string(b) != "'test2' created!\n" {
 		t.Errorf("%q doesn't match expected out", b)
 	}
@@ -86,7 +85,7 @@ func TestUpdateData(t *testing.T) {
 
 // test showing data
 func TestShowData(t *testing.T) {
-	key:= "test"
+	key := "test"
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("https://%s/blobs/%s", config.Addr, key), nil)
 	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
@@ -99,7 +98,6 @@ func TestShowData(t *testing.T) {
 	defer res.Body.Close()
 
 	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
 	if string(b) != "data" {
 		t.Errorf("%q doesn't match expected out", b)
 	}
@@ -107,7 +105,7 @@ func TestShowData(t *testing.T) {
 
 // test heading data
 func TestHeadData(t *testing.T) {
-	key:= "test"
+	key := "test"
 
 	req, _ := http.NewRequest("HEAD", fmt.Sprintf("https://%s/blobs/%s", config.Addr, key), nil)
 	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
@@ -128,7 +126,7 @@ func TestHeadData(t *testing.T) {
 
 // test removing data
 func TestRemoveData(t *testing.T) {
-	key:= "test"
+	key := "test"
 
 	req, _ := http.NewRequest("DELETE", fmt.Sprintf("https://%s/blobs/%s", config.Addr, key), nil)
 	req.Header.Add("X-NANOBOX-TOKEN", "TOKEN")
@@ -141,7 +139,7 @@ func TestRemoveData(t *testing.T) {
 	defer res.Body.Close()
 
 	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
+
 	if string(b) != "'test' destroyed!\n" {
 		t.Errorf("%q doesn't match expected out", b)
 	}
@@ -159,9 +157,12 @@ func TestListData(t *testing.T) {
 	}
 	defer res.Body.Close()
 
-	b, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(b)
-	if string(b) != "[{\"Name\":\"test2\",\"Size\":5}]" {
-		t.Errorf("%q doesn't match expected out", b)
+	body, _ := ioutil.ReadAll(res.Body)
+
+	var list []map[string]interface{}
+	json.Unmarshal(body, &list)
+
+	if list[0]["Name"] != "test2" {
+		t.Errorf("%q doesn't match expected out", body)
 	}
 }

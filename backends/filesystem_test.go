@@ -3,32 +3,32 @@ package backends_test
 import (
 	"bytes"
 	"io/ioutil"
-	"testing"
 	"os"
+	"testing"
 
 	"github.com/nanopack/hoarder/backends"
 )
 
 var (
-	fsPath   = "/tmp/hoarder_fs_test"
-	driver   = &backends.Filesystem{Path: fsPath}
+	fsPath = "/tmp/hoarder_fs_test"
+	driver = &backends.Filesystem{Path: fsPath}
 )
 
-func TestMain(m *testing.M){
+func TestMain(m *testing.M) {
 	// start clean
 	os.RemoveAll(fsPath)
 
 	// run
 	rtn := m.Run()
 
-	// end clean	
+	// end clean
 	os.RemoveAll(fsPath)
 
 	os.Exit(rtn)
 }
 
 // test init
-func TestInit(t *testing.T){
+func TestInit(t *testing.T) {
 	driver.Init()
 	if _, err := os.Stat(fsPath); err != nil {
 		t.Error("Failed to INIT filesystem - ", err)
@@ -40,16 +40,16 @@ func TestInit(t *testing.T){
 }
 
 // test write
-func TestWrite(t *testing.T){
+func TestWrite(t *testing.T) {
 	reader := bytes.NewBuffer([]byte("testdata"))
-	
+
 	if err := driver.Write("testfile", reader); err != nil {
 		t.Error("Failed to WRITE file - ", err)
 	}
 }
 
 // test list
-func TestList(t *testing.T){
+func TestList(t *testing.T) {
 	fileInfo, err := driver.List()
 	if err != nil {
 		t.Error("Failed to LIST file - ", err)
@@ -60,7 +60,7 @@ func TestList(t *testing.T){
 }
 
 // test read
-func TestRead(t *testing.T){
+func TestRead(t *testing.T) {
 	reader, err := driver.Read("testfile")
 	if err != nil {
 		t.Error("Failed to READ file - ", err)
@@ -73,7 +73,7 @@ func TestRead(t *testing.T){
 }
 
 // test stat
-func TestStat(t *testing.T){
+func TestStat(t *testing.T) {
 	fileInfo, err := driver.Stat("testfile")
 	if err != nil {
 		t.Error("Failed to STAT file - ", err)
@@ -84,7 +84,7 @@ func TestStat(t *testing.T){
 }
 
 // test remove
-func TestRemove(t *testing.T){
+func TestRemove(t *testing.T) {
 	err := driver.Remove("testfile")
 	if err != nil {
 		t.Error("Failed to REMOVE file - ", err)
@@ -92,7 +92,7 @@ func TestRemove(t *testing.T){
 }
 
 // ensure remove idempotency
-func TestRemove2(t *testing.T){
+func TestRemove2(t *testing.T) {
 	err := driver.Remove("testfile")
 	if err != nil {
 		t.Error("Failed to REMOVE file - ", err)

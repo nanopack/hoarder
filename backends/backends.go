@@ -2,12 +2,14 @@ package backends
 
 import (
 	"errors"
+	"time"
 )
 
 //
 type FileInfo struct {
-	Name string
-	Size int64
+	Name    string    `json:"Name"`
+	Size    int64     `json:"Size"`
+	ModTime time.Time `json:"ModTime"`
 }
 
 // errors

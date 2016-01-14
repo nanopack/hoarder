@@ -36,7 +36,7 @@ func (d Filesystem) List() ([]FileInfo, error) {
 	//
 	info := []FileInfo{}
 	for _, fi := range files {
-		info = append(info, FileInfo{Name: fi.Name(), Size: fi.Size()})
+		info = append(info, FileInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()})
 	}
 
 	//
@@ -70,7 +70,7 @@ func (d Filesystem) Stat(key string) (FileInfo, error) {
 	}
 
 	//
-	return FileInfo{Name: fi.Name(), Size: fi.Size()}, nil
+	return FileInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()}, nil
 }
 
 // Write

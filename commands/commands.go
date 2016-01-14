@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"os"
-	"net/http"
 	"crypto/tls"
+	"net/http"
+	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/jcelliott/lumber"
+	"github.com/spf13/cobra"
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/config"
@@ -36,7 +36,6 @@ var (
 			config.Log = lumber.NewConsoleLogger(lumber.LvlInt(config.LogLevel))
 			config.Log.Prefix("[hoarder]")
 
-
 			// if --config is passed, attempt to parse the config file
 			if conf != "" {
 				if err := config.Parse(conf); err != nil {
@@ -54,7 +53,12 @@ var (
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				config.Log.Info("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
+				config.Log.Info("Starting hoarder server at '%s:%s'...\n", config.Host, config.Port)
+
+				// enable garbage collection if age config was changed
+				if ccmd.Flag("clean-after").Changed || config.CleanAfter.Changed {
+					config.GarbageCollect = true
+				}
 
 				// start the API
 				if err := api.Start(); err != nil {
@@ -73,6 +77,7 @@ func init() {
 
 	// persistent flags
 	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().Uint64VarP(&config.CleanAfter.Value, "clean-after", "g", config.CleanAfter.Value, "Age data is deemed garbage (seconds)")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
 	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", true, "Disable tls key checking")
 	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")
