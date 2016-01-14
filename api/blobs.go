@@ -1,13 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-// get
+// get returns the data corresponding to specified key
 func get(rw http.ResponseWriter, req *http.Request) {
 
 	key := req.URL.Query().Get(":blob")
@@ -30,7 +31,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	rw.Write(b)
 }
 
-// getHead
+// getHead returns info pertaining to data corresponding to specified key
 func getHead(rw http.ResponseWriter, req *http.Request) {
 
 	key := req.URL.Query().Get(":blob")
@@ -48,10 +49,10 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Date", time.Now().UTC().Format(time.RFC1123))
 
 	//
-	writeBody(nil, rw)
+	rw.Write(nil)
 }
 
-// create
+// create writes data corresponding to specified key and returns a success message
 func create(rw http.ResponseWriter, req *http.Request) {
 
 	key := req.URL.Query().Get(":blob")
@@ -66,7 +67,7 @@ func create(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte(fmt.Sprintf("'%s' created!\n", key)))
 }
 
-// delete
+// delete removes key and corresponding data
 func delete(rw http.ResponseWriter, req *http.Request) {
 
 	key := req.URL.Query().Get(":blob")
@@ -81,7 +82,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 
-// list
+// list returns a list of all keys with relevand information
 func list(rw http.ResponseWriter, req *http.Request) {
 
 	//
@@ -93,6 +94,11 @@ func list(rw http.ResponseWriter, req *http.Request) {
 
 	rw.Header().Set("Content-Type", "application/json")
 
-	//
-	writeBody(fis, rw)
+	jfis, err := json.Marshal(fis)
+	if err != nil {
+		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		return
+	}
+
+	rw.Write(append(jfis, byte('\n')))
 }

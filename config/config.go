@@ -24,7 +24,7 @@ type ConfigUint64Var struct {
 //
 var (
 	// configurable options
-	// time.Now().Unix() ensures safety if a config file is used to turn on gc
+	// CleanAfter's time.Now().Unix() ensures safety if a config file is used to turn on gc
 	CleanAfter = ConfigUint64Var{uint64(time.Now().Unix()), false} // the age that data is deemed garbage (seconds)
 	Connection = "file://"                                         // the pluggable backend the api will use for storage
 	Host       = "127.0.0.1"                                       // the connection host
@@ -40,7 +40,8 @@ var (
 	Log            lumber.Logger       // the logger to use
 )
 
-//
+// Parse retrieves configuration options found in config file, overwriting any
+// flags passed in
 func Parse(path string) error {
 
 	// if a config is provided (and found), parse the config file overwriting any

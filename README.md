@@ -51,8 +51,9 @@ Use " [command] --help" for more information about a command.
 
 ## Configuration
 
-To configure hoarder, a config file can be passed with --config. If no config file
-is passed reasonable defaults will be used.
+To configure hoarder, a config file can be passed with --config. Configuration read in
+through a file will overwrite the same configuration specified by a flag. If no config
+file is passed, and no flags are set, reasonable defaults will be used.
 
 ```
 # following are all the available configuration file options (all default values are shown)

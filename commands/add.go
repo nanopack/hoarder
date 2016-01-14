@@ -44,7 +44,7 @@ func init() {
 	createCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
 }
 
-// add
+// add utilizes the api to add data corresponding to a specified key
 func add(ccmd *cobra.Command, args []string) {
 
 	// handle any missing args
@@ -73,6 +73,7 @@ func add(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		// most often occurs due to server not listening, Exit to keep output clean
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}

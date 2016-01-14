@@ -19,7 +19,7 @@ var listCmd = &cobra.Command{
 	Run: list,
 }
 
-// list
+// list utilizes the api to retrieve a list of all keys with associated info
 func list(ccmd *cobra.Command, args []string) {
 
 	config.Log.Debug("Listing: %s", fmt.Sprintf("%s/blobs", config.URI))
@@ -36,6 +36,7 @@ func list(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		// most often occurs due to server not listening, Exit to keep output clean
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}

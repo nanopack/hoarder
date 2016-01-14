@@ -52,7 +52,7 @@ func init() {
 	removeCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
 }
 
-// remove
+// remove utilizes the api to remove a key and associated data
 func remove(ccmd *cobra.Command, args []string) {
 
 	// handle any missing args
@@ -76,6 +76,7 @@ func remove(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		// most often occurs due to server not listening, Exit to keep output clean
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}

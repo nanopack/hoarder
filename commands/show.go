@@ -52,7 +52,7 @@ func init() {
 	showCmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
 }
 
-// show
+// show utilizes the api to show data associated to key
 func show(ccmd *cobra.Command, args []string) {
 
 	// handle any missing args
@@ -76,6 +76,7 @@ func show(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		// most often occurs due to server not listening, Exit to keep output clean
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}
