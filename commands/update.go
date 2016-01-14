@@ -26,7 +26,7 @@ func init() {
 	updateCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
 }
 
-// update
+// update utilizes the api to update a key with specified data
 func update(ccmd *cobra.Command, args []string) {
 
 	// handle any missing args
@@ -56,6 +56,7 @@ func update(ccmd *cobra.Command, args []string) {
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		// most often occurs due to server not listening, Exit to keep output clean
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
 	}

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,9 +14,8 @@ import (
 	"github.com/nanopack/hoarder/config"
 )
 
+// utilized by the various backends
 type (
-
-	//
 	Driver interface {
 		Init() error
 		List() ([]backends.FileInfo, error)
@@ -31,10 +29,10 @@ type (
 //
 var driver Driver
 
-// Start
+// Start the api
 func Start() error {
 
-	//
+	// set, and initialize, the backend driver
 	if err := setDriver(); err != nil {
 		config.Log.Fatal(err.Error())
 		os.Exit(1)
@@ -53,13 +51,13 @@ func Start() error {
 //
 func setDriver() error {
 
-	//
+	// parse connection string
 	u, err := url.Parse(config.Connection)
 	if err != nil {
 		return err
 	}
 
-	//
+	// set backend based on connection string's scheme
 	switch u.Scheme {
 	case "file":
 		driver = &backends.Filesystem{Path: u.Path}
@@ -81,6 +79,7 @@ addition.
 `, u.Scheme)
 	}
 
+	// initialize the driver
 	return driver.Init()
 }
 
@@ -121,16 +120,4 @@ func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc
 			rw.Header().Get("status"), req.Header.Get("Content-Length"),
 			req.Header.Get("User-Agent"), req.Header.Get("X-Nanobox-Token"))
 	}
-}
-
-// writeBody
-func writeBody(v interface{}, rw http.ResponseWriter) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	rw.Write(b)
-
-	return nil
 }

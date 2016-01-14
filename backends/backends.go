@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-//
+// selection of relevant file information
 type FileInfo struct {
 	Name    string    `json:"Name"`
 	Size    int64     `json:"Size"`

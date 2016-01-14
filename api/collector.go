@@ -8,12 +8,11 @@ import (
 	"github.com/nanopack/hoarder/config"
 )
 
+// garbage collection will have this many seconds before consistancy
 const CLEAN_FREQ = 10
 
+// removeOldKeys removes keys older than specified age
 func removeOldKeys() error {
-	if !config.GarbageCollect {
-		return errors.New("Garbage collection not 'on' but cleanup called! Killing GC")
-	}
 	datas, err := driver.List()
 	if err != nil {
 		return err
@@ -23,6 +22,10 @@ func removeOldKeys() error {
 
 	config.Log.Trace("Garbage Collector - Finding files...")
 	for _, data := range datas {
+		// CleanAfter.Value defaults to Now() to ensure no files are deleted in case
+		// cobra decides to change how 'Command.Flag().Changed' works. It does this
+		// because no files, written by hoarder, will have a modified time before the
+		// Unix epoch began
 		if data.ModTime.Unix() < (now.Unix() - int64(config.CleanAfter.Value)) {
 			config.Log.Debug("Cleaning key: %s", data.Name)
 			if err := driver.Remove(data.Name); err != nil {
@@ -34,13 +37,13 @@ func removeOldKeys() error {
 	return nil
 }
 
+// startCollection calls removeOldKeys at set intervals
 func startCollection() {
 	tick := time.Tick(CLEAN_FREQ * time.Second)
 
 	for _ = range tick {
 		if err := removeOldKeys(); err != nil {
 			config.Log.Error(err.Error())
-			return
 		}
 	}
 }
