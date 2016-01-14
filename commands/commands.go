@@ -54,7 +54,9 @@ var (
 
 			// if --server is passed start the hoarder server
 			if server != false {
-				config.Log.Info("Starting hoarder server at '%s', listening on port '%s'...\n", config.Host, config.Port)
+				config.Log.Info("Starting hoarder server at '%s:%s'...\n", config.Host, config.Port)
+
+				config.GarbageCollect = ccmd.Flag("clean-after").Changed
 
 				// start the API
 				if err := api.Start(); err != nil {
@@ -73,6 +75,7 @@ func init() {
 
 	// persistent flags
 	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().Uint64VarP(&config.CleanAfter, "clean-after", "g", config.CleanAfter, "Age data is deemed garbage (seconds)")
 	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
 	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", true, "Disable tls key checking")
 	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")

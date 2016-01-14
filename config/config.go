@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/ghodss/yaml"
 	"github.com/jcelliott/lumber"
@@ -20,8 +21,8 @@ var (
 
 	//  configurable options
 	Connection = "file://"   // the pluggable backend the api will use for storage
-	GCInterval = 0           // the interval between clearning out old storage
-	GCAmount   = 0           // the amount of storage to clear at interval
+	// time.Now().Unix() ensures safety if a config file is used to turn on gc
+	CleanAfter = uint64(time.Now().Unix()) // the age that data is deemed garbage (seconds)
 	Host       = "127.0.0.1" // the connection host
 	Insecure   = true        // connect insecurly
 	LogLevel   = "info"      // the output log level
@@ -29,6 +30,7 @@ var (
 	Token      = "TOKEN"     // the secury token used to connect with
 
 	// internal options
+	GarbageCollect = false   // to clean or not to clean
 	Addr = Host + ":" + Port // the host:port connection
 	URI  = "https://" + Addr // the connection URI
 	Log  lumber.Logger       // the logger to use
@@ -56,20 +58,20 @@ func Parse(path string) error {
 		// override defaults
 		for k, v := range options {
 			switch k {
+			case "clean_after":
+				i, err := strconv.Atoi(v)
+				if err != nil {
+					return err
+				}
+				CleanAfter = uint64(i)
+			case "collect":
+				b, err := strconv.ParseBool(v)
+				if err != nil {
+					return err
+				}
+				GarbageCollect = b
 			case "connection":
 				Connection = v
-			case "gc_interval":
-				i, err := strconv.Atoi(v)
-				if err != nil {
-					return err
-				}
-				GCInterval = i
-			case "gc_amount":
-				i, err := strconv.Atoi(v)
-				if err != nil {
-					return err
-				}
-				GCAmount = i
 			case "host":
 				Host = v
 			case "insecure":

@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	fsPath   = "/tmp/hoarder_fs_test"
-	driver   = &backends.Filesystem{Path: fsPath}
+	fsPath = "/tmp/hoarder_fs_test"
+	driver = &backends.Filesystem{Path: fsPath}
 )
 
 func TestMain(m *testing.M){
