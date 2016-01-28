@@ -16,6 +16,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	//
 	r, err := driver.Read(key)
 	if err != nil {
+		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -23,6 +24,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	//
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
+		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -39,6 +41,7 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 	//
 	fi, err := driver.Stat(key)
 	if err != nil {
+		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -82,12 +85,13 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte(fmt.Sprintf("'%s' destroyed!\n", key)))
 }
 
-// list returns a list of all keys with relevand information
+// list returns a list of all keys with relevant information
 func list(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	fis, err := driver.List()
 	if err != nil {
+		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -96,6 +100,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 
 	jfis, err := json.Marshal(fis)
 	if err != nil {
+		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
