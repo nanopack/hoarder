@@ -1,4 +1,4 @@
-[![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)
+[![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)  
 [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
 
 Hoarder is a simple, api-driven, storage system for storing anything for cloud
@@ -15,6 +15,15 @@ Hoarder can be used in 2 ways:
 ##### As a server
 To start hoarder as a server run `hoarder --server`. An optional config file can
 be passed with `--config /path/to/config`
+> config.yml
+>```
+connection: "file:///var/db/hoarder"
+host: "127.0.0.1"
+port: "7410"
+insecure: true
+log_level: "info"
+token: "TOKEN"
+```
 
 ##### As a CLI
 Simply run `hoarder <COMMAND>`
