@@ -8,5 +8,8 @@ import (
 func main() {
 
 	//
-	commands.HoarderCmd.Execute()
+	if err := commands.HoarderCmd.Execute(); err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
 }
