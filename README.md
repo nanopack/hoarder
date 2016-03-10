@@ -80,12 +80,12 @@ token       : "TOKEN"              # the secury token used to connect with
 ```
 | Method |     Route     | Functionality |
 ------------------------------------------
-| HEAD   | /blobs/{blob} | Retrieve file information about a blob
-| GET    | /blobs/{blob} | Retrieve a blob
+| HEAD   | /blobs/{id} | Retrieve file information about a blob
+| GET    | /blobs/{id} | Retrieve a blob
 | GET    | /blobs"       | List all blobs
-| POST   | /blobs/{blob} | Publish a new blob
-| PUT    | /blobs/{blob} | Update an existing blob
-| DELETE | /blobs/{blob} | Remove an existing blob
+| POST   | /blobs/{id} | Publish a new blob
+| PUT    | /blobs/{id} | Update an existing blob
+| DELETE | /blobs/{id} | Remove an existing blob
 ```
 
 ### Contributing
