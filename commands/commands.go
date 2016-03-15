@@ -2,26 +2,28 @@ package commands
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jcelliott/lumber"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/nanopack/hoarder/api"
-	"github.com/nanopack/hoarder/config"
 )
 
 var (
+	log lumber.Logger
 
 	//
-	conf    string //
-	server  bool   //
+	config  string //
+	daemon  bool   //
 	version bool   //
 
 	//
-	key  string //
-	data string //
+	uri string
 
 	//
 	HoarderCmd = &cobra.Command{
@@ -32,19 +34,26 @@ var (
 		// parse the config if one is provided, or use the defaults. Set the backend
 		// driver to be used
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
+
 			// create a new logger
-			config.Log = lumber.NewConsoleLogger(lumber.LvlInt(config.LogLevel))
-			config.Log.Prefix("[hoarder]")
+			log = lumber.NewConsoleLogger(lumber.LvlInt(viper.GetString("log-level")))
+			log.Prefix("[hoarder]")
 
 			// if --config is passed, attempt to parse the config file
-			if conf != "" {
-				if err := config.Parse(conf); err != nil {
-					config.Log.Error("Failed to parse config '%s' - %s", conf, err.Error())
+			if config != "" {
+
+				//
+				viper.SetConfigName("config")
+				viper.AddConfigPath(config)
+
+				// Find and read the config file; Handle errors reading the config file
+				if err := viper.ReadInConfig(); err != nil {
+					panic(fmt.Errorf("Fatal error config file: %s \n", err))
 				}
 			}
 
 			// configure InsecureSkipVerify using setting from 'insecure' flag
-			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: config.Insecure}
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: viper.GetBool("insecure")}
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending on what flags
@@ -52,17 +61,21 @@ var (
 		Run: func(ccmd *cobra.Command, args []string) {
 
 			// if --server is passed start the hoarder server
-			if server != false {
-				config.Log.Info("Starting hoarder server at '%s:%s'...\n", config.Host, config.Port)
+			if daemon {
 
-				// enable garbage collection if age config was changed
-				if ccmd.Flag("clean-after").Changed || config.CleanAfter.Changed {
-					config.GarbageCollect = true
+				// enable/start garbage collection if age config was changed
+				if ccmd.Flag("clean-after").Changed {
+					fmt.Printf("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
+
+					viper.Set("garbage-collect", true)
+
+					// start garbage collector
+					go api.StartCollection()
 				}
 
 				// start the API
 				if err := api.Start(); err != nil {
-					config.Log.Fatal("Failed to start - %s", err.Error())
+					fmt.Println("Failed to start API!", err)
 					os.Exit(1)
 				}
 			}
@@ -75,18 +88,42 @@ var (
 
 func init() {
 
-	// persistent flags
-	HoarderCmd.PersistentFlags().StringVarP(&config.Connection, "connection", "c", config.Connection, "Hoarder backend driver")
-	HoarderCmd.PersistentFlags().Uint64VarP(&config.CleanAfter.Value, "clean-after", "g", config.CleanAfter.Value, "Age data is deemed garbage (seconds)")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Host, "host", "H", config.Host, "Hoarder hostname/IP")
-	HoarderCmd.PersistentFlags().BoolVarP(&config.Insecure, "insecure", "i", true, "Disable tls key checking")
-	HoarderCmd.PersistentFlags().StringVarP(&config.LogLevel, "log-level", "", config.LogLevel, "Hoarder output log level")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Port, "port", "p", config.Port, "Hoarder port")
-	HoarderCmd.PersistentFlags().StringVarP(&config.Token, "token", "t", config.Token, "Hoarder auth token")
+	// set config defaults; these are overriden if a --config file is provided
+	// (see above)
+	viper.SetDefault("backend", "file://")
+	viper.SetDefault("clean-after", uint64(time.Now().Unix()))
+	viper.SetDefault("garbage-collect", false)
+	viper.SetDefault("host", "127.0.0.1")
+	viper.SetDefault("insecure", true)
+	viper.SetDefault("log-level", "INFO")
+	viper.SetDefault("port", "7410")
+	viper.SetDefault("token", "")
+	viper.SetDefault("uri", fmt.Sprintf("%v:%v", viper.GetString("host"), viper.GetString("port")))
 
-	// local flags
-	HoarderCmd.Flags().StringVarP(&conf, "config", "", "", "Path to config options")
-	HoarderCmd.Flags().BoolVarP(&server, "server", "", false, "Run hoader as a server")
+	//
+	uri = fmt.Sprintf("%s:%s", viper.GetString("host"), viper.GetString("port"))
+
+	// persistent flags
+	HoarderCmd.PersistentFlags().StringP("backend", "b", viper.GetString("backend"), "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().IntP("clean-after", "g", viper.GetInt("clean-after"), "Age data is deemed garbage (seconds)")
+	HoarderCmd.PersistentFlags().StringP("host", "H", viper.GetString("host"), "Hoarder hostname/IP")
+	HoarderCmd.PersistentFlags().BoolP("insecure", "i", viper.GetBool("insecure"), "Disable tls key checking")
+	HoarderCmd.PersistentFlags().String("log-level", viper.GetString("log-level"), "Hoarder output log level")
+	HoarderCmd.PersistentFlags().StringP("port", "p", viper.GetString("port"), "Hoarder port")
+	HoarderCmd.PersistentFlags().StringP("token", "t", viper.GetString("token"), "Hoarder auth token")
+
+	//
+	viper.BindPFlag("backend", HoarderCmd.PersistentFlags().Lookup("backend"))
+	viper.BindPFlag("clean-after", HoarderCmd.PersistentFlags().Lookup("clean-after"))
+	viper.BindPFlag("log-level", HoarderCmd.PersistentFlags().Lookup("log-level"))
+	viper.BindPFlag("host", HoarderCmd.PersistentFlags().Lookup("host"))
+	viper.BindPFlag("insecure", HoarderCmd.PersistentFlags().Lookup("insecure"))
+	viper.BindPFlag("port", HoarderCmd.PersistentFlags().Lookup("port"))
+	viper.BindPFlag("token", HoarderCmd.PersistentFlags().Lookup("token"))
+
+	// local flags;
+	HoarderCmd.Flags().StringVar(&config, "config", "", "Path to config options")
+	HoarderCmd.Flags().BoolVar(&daemon, "server", false, "Run hoarder as a server")
 	HoarderCmd.Flags().BoolVarP(&version, "version", "v", false, "Display the current version of this CLI")
 
 	// commands

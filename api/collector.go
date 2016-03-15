@@ -1,11 +1,10 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
-	"github.com/nanopack/hoarder/config"
+	"github.com/spf13/viper"
 )
 
 // garbage collection will have this many seconds before consistancy
@@ -20,16 +19,17 @@ func removeOldKeys() error {
 
 	now := time.Now()
 
-	config.Log.Trace("Garbage Collector - Finding files...")
+	fmt.Println("Garbage Collector - Finding files...")
 	for _, data := range datas {
+
 		// CleanAfter.Value defaults to Now() to ensure no files are deleted in case
 		// cobra decides to change how 'Command.Flag().Changed' works. It does this
 		// because no files, written by hoarder, will have a modified time before the
 		// Unix epoch began
-		if data.ModTime.Unix() < (now.Unix() - int64(config.CleanAfter.Value)) {
-			config.Log.Debug("Cleaning key: %s", data.Name)
+		if data.ModTime.Unix() < (now.Unix() - int64(viper.GetInt("clean-after"))) {
+			fmt.Printf("Cleaning key: %s\n", data.Name)
 			if err := driver.Remove(data.Name); err != nil {
-				return errors.New(fmt.Sprintf("Cleaning of '%s' failed - ", data.Name, err.Error()))
+				return fmt.Errorf("Cleaning of '%s' failed - %v", data.Name, err.Error())
 			}
 		}
 	}
@@ -37,13 +37,13 @@ func removeOldKeys() error {
 	return nil
 }
 
-// startCollection calls removeOldKeys at set intervals
-func startCollection() {
+// StartCollection calls removeOldKeys at set intervals
+func StartCollection() {
 	tick := time.Tick(CLEAN_FREQ * time.Second)
 
 	for _ = range tick {
 		if err := removeOldKeys(); err != nil {
-			config.Log.Error(err.Error())
+			fmt.Println(err.Error())
 		}
 	}
 }

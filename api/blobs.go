@@ -70,6 +70,11 @@ func create(rw http.ResponseWriter, req *http.Request) {
 	rw.Write([]byte(fmt.Sprintf("'%s' created!\n", key)))
 }
 
+// update writes data corresponding to specified key and returns a success message
+func update(rw http.ResponseWriter, req *http.Request) {
+	create(rw, req)
+}
+
 // delete removes key and corresponding data
 func delete(rw http.ResponseWriter, req *http.Request) {
 

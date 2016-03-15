@@ -1,35 +1,24 @@
 [![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)  
 [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
 
-Hoarder is a simple, api-driven, storage system for storing anything for cloud
-based deployment services.
-
-## Status
-
-Nearly Complete/Experimental
+Hoarder is a simple, api-driven, storage system for storing anything for cloud based deployment services.
 
 ## Usage
 
-Hoarder can be used in 2 ways:
+#### As a server
+To start hoarder as a server run:
 
-##### As a server
-To start hoarder as a server run `hoarder --server`. An optional config file can
-be passed with `--config /path/to/config`
-> config.yml
->```
-connection: "file:///var/db/hoarder"
-host: "127.0.0.1"
-port: "7410"
-insecure: true
-log_level: "info"
-token: "TOKEN"
-```
+`hoarder --server`
 
-##### As a CLI
+An optional config file can also be passed on startup:
+
+`hoarder --server --config /path/to/config`
+
+#### As a CLI
+
 Simply run `hoarder <COMMAND>`
 
-`hoarder` or `hoarder -h` will provide help information including usage and a
-list of commands:
+`hoarder` or `hoarder -h` will show usage and a list of commands:
 
 ```
 Usage:
@@ -60,33 +49,110 @@ Use " [command] --help" for more information about a command.
 
 ## Configuration
 
-To configure hoarder, a config file can be passed with --config. Configuration read in
-through a file will overwrite the same configuration specified by a flag. If no config
-file is passed, and no flags are set, reasonable defaults will be used.
+To configure hoarder, a config file can be passed with --config. Configuration read in through a file will overwrite the same configuration specified by a flag. If no config file is passed, and no flags are set, reasonable defaults will be used.
 
-```
-# following are all the available configuration file options (all default values are shown)
-clean_after : 0                    # the age that data is deemed garbage (seconds)
-connection  : "file://"            # the pluggable backend the api will use for storage
-host        : 127.0.0.1            # the connection host
-insecure    : true                 # connect insecurly
-log_level   : "info"               # the output log level
-port        : "7410"               # the connection port
-token       : "TOKEN"              # the secury token used to connect with
+```ini
+clean_after : 0               # the age that data is deemed garbage (seconds)
+backend     : "file://"       # the pluggable backend the api will use for storage
+host        : 127.0.0.1       # the connection host
+insecure    : true            # connect insecurely
+log_level   : "info"          # the output log level
+port        : "7410"          # the connection port
+token       : ""              # the secure token used to connect with (no auth by default)
 ```
 
-## Routes:
+## API:
 
 ```
 | Method |     Route     | Functionality |
 ------------------------------------------
-| HEAD   | /blobs/{id} | Retrieve file information about a blob
-| GET    | /blobs/{id} | Retrieve a blob
-| GET    | /blobs"       | List all blobs
-| POST   | /blobs/{id} | Publish a new blob
-| PUT    | /blobs/{id} | Update an existing blob
-| DELETE | /blobs/{id} | Remove an existing blob
+| GET    | /blobs"      | List all blobs
+| GET    | /blobs/{:id} | Retrieve a blob
+| POST   | /blobs/{:id} | Publish a new blob
+| PUT    | /blobs/{:id} | Update an existing blob
+| DELETE | /blobs/{:id} | Remove an existing blob
+| HEAD   | /blobs"      | Retrieve file information for all blobs
+| HEAD   | /blobs/{:id} | Retrieve file information about a blob
 ```
+
+#### Examples
+
+##### ping:
+```
+$ curl -k https://localhost:7410/ping
+=> pong
+```
+
+##### create:
+```
+$ curl -k https://localhost:7410/blobs/test -d "data"
+=> 'test' created!
+```
+
+##### get:
+```
+$ curl -k https://localhost:7410/blobs/test
+=> data
+```
+
+##### get head:
+```
+$ curl -k https://localhost:7410/blobs/test -I
+=> HTTP/1.1 200 OK
+=> Content-Length: 4
+=> Date: Tue, 01 Mar 2016 21:14:28 UTC
+=> Last-Modified: Tue, 01 Mar 2016 21:13:57 UTC
+=> Content-Type: text/plain; charset=utf-8
+```
+
+##### update:
+```
+$ curl -k https://localhost:7410/blobs/test -d "new data" -X PUT
+=> 'test' created!
+```
+
+##### list:
+```
+$ curl -k https://localhost:7410/blobs
+=> [{"Name":"test","Size":4,"ModTime":"2016-03-01T21:13:57.534706044Z"}]
+```
+
+##### delete:
+```
+$ curl -k https://localhost:7410/blobs/test -X DELETE
+=> 'test' destroyed!
+```
+
+*Note*: all examples are run without auth. If auth was enabled when the server was started then an additional header needs to be present:
+
+`-H "x-auth-token: TOKEN"`
+
+## Data
+
+Hoarder simply stores whatever data you give it as a string. So you can literally store whatever you want as long is it can be "stringified".
+
+Some examples of what data could look like when creating a new blob:
+
+##### string
+```
+$ curl -k https://localhost:7410/blobs/test -d "some string"
+```
+
+##### JSON
+``` json
+$ curl -k https://localhost:7410/blobs/test -d "{\"key\":\"value\"}"
+```
+
+When it retrieves data it might look like the following:
+```
+{
+	"Name": "test",
+	"Size": 4,
+	"ModTime": "2016-03-01T21:13:57.534706044Z"
+}
+```
+
+
 
 ### Contributing
 
@@ -95,5 +161,12 @@ Contributions to the hoarder project are welcome and encouraged. Hoarder is a [N
 ### Licence
 
 Mozilla Public License Version 2.0
+
+[![open source](http://nano-assets.gopagoda.io/open-src/nanobox-open-src.png)](http://nanobox.io/open-source)
+
+
+## Contributing
+
+Contributions to hoarder are welcome and encouraged. Hoarder is a [Nanobox](https://nanobox.io) project and contributions should follow the [Nanobox Contribution Process & Guidelines](https://docs.nanobox.io/contributing/).
 
 [![open source](http://nano-assets.gopagoda.io/open-src/nanobox-open-src.png)](http://nanobox.io/open-source)

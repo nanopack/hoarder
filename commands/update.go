@@ -8,8 +8,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	"github.com/nanopack/hoarder/config"
+	"github.com/spf13/viper"
 )
 
 var updateCmd = &cobra.Command{
@@ -32,32 +31,32 @@ func update(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		config.Log.Error("Missing key - please provide the key for the record you'd like to update")
+		fmt.Println("Missing key - please provide the key for the record you'd like to update")
 		return
 	case data == "":
-		config.Log.Error("Missing data - please provide the data that you would like to update")
+		fmt.Println("Missing data - please provide the data that you would like to update")
 		return
 	}
 
-	config.Log.Debug("Updating: %s", fmt.Sprintf("%s/blobs/%s", config.URI, key))
+	fmt.Printf("Updating: %s/blobs/%s\n", uri, key)
 
 	//
 	body := bytes.NewBuffer([]byte(data))
 
 	//
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", config.URI, key), body)
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", uri, key), body)
 	if err != nil {
-		config.Log.Error(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	//
-	req.Header.Add("X-NANOBOX-TOKEN", config.Token)
+	req.Header.Add("x-auth-token", viper.GetString("token"))
 
 	//
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// most often occurs due to server not listening, Exit to keep output clean
-		config.Log.Fatal(err.Error())
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 	defer res.Body.Close()
@@ -65,7 +64,7 @@ func update(ccmd *cobra.Command, args []string) {
 	//
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		config.Log.Error(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	fmt.Print(string(b))
