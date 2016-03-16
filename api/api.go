@@ -8,10 +8,11 @@ import (
 	"os"
 
 	"github.com/gorilla/pat"
+	"github.com/jcelliott/lumber"
 	nanoauth "github.com/nanobox-io/golang-nanoauth"
+	"github.com/spf13/viper"
 
 	"github.com/nanopack/hoarder/backends"
-	"github.com/nanopack/hoarder/config"
 )
 
 // utilized by the various backends
@@ -29,30 +30,25 @@ type (
 //
 var driver Driver
 
-// Start the api
+// Start
 func Start() error {
 
 	// set, and initialize, the backend driver
 	if err := setDriver(); err != nil {
-		config.Log.Fatal(err.Error())
+		lumber.Error(err.Error())
 		os.Exit(1)
 	}
 
-	// start garbage collector
-	if config.GarbageCollect {
-		config.Log.Debug("Starting garbage collector (data older than %ds)...", config.CleanAfter.Value)
-		go startCollection()
-	}
-
 	// blocking...
-	return nanoauth.ListenAndServeTLS(config.Addr, config.Token, routes())
+	lumber.Debug("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
+	return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
 }
 
-//
+// setDriver
 func setDriver() error {
 
 	// parse connection string
-	u, err := url.Parse(config.Connection)
+	u, err := url.Parse(viper.GetString("backend"))
 	if err != nil {
 		return err
 	}
@@ -85,7 +81,7 @@ addition.
 
 // routes registers all api routes with the router
 func routes() *pat.Router {
-	config.Log.Debug("Registering routes...\n")
+	lumber.Debug("Registering routes...\n")
 
 	//
 	router := pat.New()
@@ -96,28 +92,61 @@ func routes() *pat.Router {
 	})
 
 	// blobs
-	router.Add("HEAD", "/blobs/{blob}", handleRequest(getHead))
-	router.Get("/blobs/{blob}", handleRequest(get))
-	router.Get("/blobs", handleRequest(list))
-	router.Add("HEAD", "/blobs", handleRequest(list))
-	router.Post("/blobs/{blob}", handleRequest(create))
-	router.Put("/blobs/{blob}", handleRequest(create))
-	router.Delete("/blobs/{blob}", handleRequest(delete))
+	router.Add("HEAD", "/blobs/{blob}", authenticate(handleRequest(getHead)))
+	router.Get("/blobs/{blob}", authenticate(handleRequest(get)))
+	router.Post("/blobs/{blob}", authenticate(handleRequest(create)))
+	router.Put("/blobs/{blob}", authenticate(handleRequest(update)))
+	router.Delete("/blobs/{blob}", authenticate(handleRequest(delete)))
 
+	router.Add("HEAD", "/blobs", authenticate(handleRequest(list))) // needs to be after get
+	router.Get("/blobs", authenticate(handleRequest(list)))         // needs to be after get
+
+	//
 	return router
+}
+
+// authenticate veerifies that the token is allowed throught the authenticator
+func authenticate(fn http.HandlerFunc) http.HandlerFunc {
+	return func(rw http.ResponseWriter, req *http.Request) {
+
+		// if a token was provided at startup then its presumed authentication is
+		// desired
+		if viper.GetString("token") != "" {
+
+			// check to see if the token was passed either in the header or as a query
+			// param
+			var xtoken string
+			switch {
+			case req.Header.Get("x-auth-token") != "":
+				xtoken = req.Header.Get("x-auth-token")
+			case req.FormValue("x-auth-token") != "":
+				xtoken = req.FormValue("x-auth-token")
+			}
+
+			// if the tokens don't match then the connection is unauthorized
+			if xtoken != viper.GetString("token") {
+				rw.WriteHeader(401)
+				return
+			}
+		}
+
+		//
+		fn(rw, req)
+	}
 }
 
 // handleRequest is a wrapper for the actual route handler, simply to provide some
 // debug output
-func handleRequest(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+func handleRequest(fn http.HandlerFunc) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 
+		//
 		fn(rw, req)
 
 		// must be after fn if ever going to get rw.status (logging still more meaningful)
-		config.Log.Trace(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "X-Nanobox-Token: %s"`,
+		lumber.Debug(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "x-auth-token: %s\n"`,
 			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
 			rw.Header().Get("status"), req.Header.Get("Content-Length"),
-			req.Header.Get("User-Agent"), req.Header.Get("X-Nanobox-Token"))
+			req.Header.Get("User-Agent"), req.Header.Get("x-auth-token"))
 	}
 }

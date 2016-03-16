@@ -15,6 +15,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+
 	// start clean
 	os.RemoveAll(fsPath)
 
