@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/pat"
+	"github.com/jcelliott/lumber"
 	nanoauth "github.com/nanobox-io/golang-nanoauth"
 	"github.com/spf13/viper"
 
@@ -34,12 +35,12 @@ func Start() error {
 
 	// set, and initialize, the backend driver
 	if err := setDriver(); err != nil {
-		fmt.Printf(err.Error())
+		lumber.Error(err.Error())
 		os.Exit(1)
 	}
 
 	// blocking...
-	fmt.Printf("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
+	lumber.Debug("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
 	return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
 }
 
@@ -80,7 +81,7 @@ addition.
 
 // routes registers all api routes with the router
 func routes() *pat.Router {
-	fmt.Printf("Registering routes...\n")
+	lumber.Debug("Registering routes...\n")
 
 	//
 	router := pat.New()
@@ -143,7 +144,7 @@ func handleRequest(fn http.HandlerFunc) http.HandlerFunc {
 		fn(rw, req)
 
 		// must be after fn if ever going to get rw.status (logging still more meaningful)
-		fmt.Printf(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "x-auth-token: %s\n"`,
+		lumber.Debug(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "x-auth-token: %s\n"`,
 			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
 			rw.Header().Get("status"), req.Header.Get("Content-Length"),
 			req.Header.Get("User-Agent"), req.Header.Get("x-auth-token"))

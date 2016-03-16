@@ -35,9 +35,9 @@ var (
 		// driver to be used
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
 
-			// create a new logger
-			log = lumber.NewConsoleLogger(lumber.LvlInt(viper.GetString("log-level")))
-			log.Prefix("[hoarder]")
+			// configure the logger
+			lumber.Level(lumber.LvlInt(viper.GetString("log_level")))
+			// lumber.Prefix("[hoader]")
 
 			// if --config is passed, attempt to parse the config file
 			if config != "" {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jcelliott/lumber"
 	"github.com/spf13/viper"
 )
 
@@ -19,7 +20,7 @@ func removeOldKeys() error {
 
 	now := time.Now()
 
-	fmt.Println("Garbage Collector - Finding files...")
+	lumber.Debug("Garbage Collector - Finding files...")
 	for _, data := range datas {
 
 		// CleanAfter.Value defaults to Now() to ensure no files are deleted in case

@@ -11,10 +11,8 @@ import (
 // get returns the data corresponding to specified key
 func get(rw http.ResponseWriter, req *http.Request) {
 
-	key := req.URL.Query().Get(":blob")
-
 	//
-	r, err := driver.Read(key)
+	r, err := driver.Read(req.URL.Query().Get(":blob"))
 	if err != nil {
 		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
@@ -36,10 +34,8 @@ func get(rw http.ResponseWriter, req *http.Request) {
 // getHead returns info pertaining to data corresponding to specified key
 func getHead(rw http.ResponseWriter, req *http.Request) {
 
-	key := req.URL.Query().Get(":blob")
-
 	//
-	fi, err := driver.Stat(key)
+	fi, err := driver.Stat(req.URL.Query().Get(":blob"))
 	if err != nil {
 		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
@@ -103,6 +99,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 
 	rw.Header().Set("Content-Type", "application/json")
 
+	//
 	jfis, err := json.Marshal(fis)
 	if err != nil {
 		rw.WriteHeader(500)
@@ -110,5 +107,6 @@ func list(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	//
 	rw.Write(append(jfis, byte('\n')))
 }

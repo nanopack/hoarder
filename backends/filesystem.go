@@ -27,6 +27,7 @@ func (d *Filesystem) Init() error {
 
 // List returns a list of files, and some info, currently stored
 func (d Filesystem) List() ([]FileInfo, error) {
+
 	//
 	files, err := ioutil.ReadDir(d.Path)
 	if err != nil {
@@ -45,6 +46,7 @@ func (d Filesystem) List() ([]FileInfo, error) {
 
 // Read reads a file and returns the contents
 func (d Filesystem) Read(key string) (io.Reader, error) {
+
 	//
 	f, err := os.Open(filepath.Join(d.Path, key))
 	if err != nil {
@@ -57,12 +59,12 @@ func (d Filesystem) Read(key string) (io.Reader, error) {
 
 // Remove removes a file
 func (d Filesystem) Remove(key string) error {
-	//
 	return os.RemoveAll(filepath.Join(d.Path, key))
 }
 
 // Stat returns information about a file
 func (d Filesystem) Stat(key string) (FileInfo, error) {
+
 	//
 	fi, err := os.Stat(filepath.Join(d.Path, key))
 	if err != nil {
@@ -75,6 +77,7 @@ func (d Filesystem) Stat(key string) (FileInfo, error) {
 
 // Write writes data do a file
 func (d Filesystem) Write(key string, r io.Reader) error {
+
 	// read the entire contents of the reader
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
