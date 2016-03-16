@@ -152,19 +152,6 @@ When it retrieves data it might look like the following:
 }
 ```
 
-
-
-### Contributing
-
-Contributions to the hoarder project are welcome and encouraged. Hoarder is a [Nanobox](https://nanobox.io) project and contributions should follow the [Nanobox Contribution Process & Guidelines](https://docs.nanobox.io/contributing/).
-
-### Licence
-
-Mozilla Public License Version 2.0
-
-[![open source](http://nano-assets.gopagoda.io/open-src/nanobox-open-src.png)](http://nanobox.io/open-source)
-
-
 ## Contributing
 
 Contributions to hoarder are welcome and encouraged. Hoarder is a [Nanobox](https://nanobox.io) project and contributions should follow the [Nanobox Contribution Process & Guidelines](https://docs.nanobox.io/contributing/).
