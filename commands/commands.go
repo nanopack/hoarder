@@ -109,7 +109,7 @@ func init() {
 
 	// set config defaults; these are overriden if a --config file is provided
 	// (see above)
-	viper.SetDefault("backend", "file://")
+	viper.SetDefault("backend", "file://") // this is set to file here, and then in the filesystem backend defaults to the actual path
 	viper.SetDefault("clean-after", uint64(time.Now().Unix()))
 	viper.SetDefault("garbage-collect", false)
 	viper.SetDefault("host", "127.0.0.1")
@@ -147,7 +147,7 @@ func init() {
 	viper.BindPFlag("token", HoarderCmd.PersistentFlags().Lookup("token"))
 
 	// local flags;
-	HoarderCmd.Flags().StringVar(&config, "config", "", "Path to config options")
+	HoarderCmd.Flags().StringVar(&config, "config", "", "/path/to/config.yml")
 	HoarderCmd.Flags().BoolVar(&daemon, "server", false, "Run hoarder as a server")
 	HoarderCmd.Flags().BoolVarP(&version, "version", "v", false, "Display the current version of this CLI")
 

@@ -33,15 +33,18 @@ Available Commands:
   update      Update a file in hoarder
 
 Flags:
-  -b, --backend="filesystem": Hoarder backend driver
-      --config="": Path to config options
-  -g, --clean-after="0": Age data is deemed garbage (seconds)
+  -b, --backend="file://": Hoarder backend driver
+  -g, --clean-after=0: Age data is deemed garbage (seconds)
+      --config="": /path/to/config.yml
+  -h, --help[=false]: help for
   -H, --host="127.0.0.1": Hoarder hostname/IP
   -i, --insecure[=true]: Disable tls key checking
-      --log-level="info": Hoarder output log level
+      --log-file="/var/log/hoarder.log": Location to save logs
+      --log-level="INFO": Hoarder output log level
+      --log-type="stdout": The type of logging (stdout/file)
   -p, --port="7410": Hoarder port
-      --server[=false]: Run hoader as a server
-  -t, --token="TOKEN": Hoarder auth token
+      --server[=false]: Run hoarder as a server
+  -t, --token="": Hoarder auth token
   -v, --version[=false]: Display the current version of this CLI
 
 Use " [command] --help" for more information about a command.
@@ -57,8 +60,8 @@ backend     : "file:///var/db/hoarder"    # the pluggable backend the api will u
 host        : 127.0.0.1                   # the connection host
 insecure    : true                        # connect insecurely
 log_type    : "stdout"                    # the type of logging
-log_file    : "/var/log/hoarder.log"      # the location of the log file
-log_level   : "info"                      # the output log level
+log_file    : "/var/log/hoarder.log"      # if log_type is "file" this is the location of the log file; ignored otherwise
+log_level   : "info"                      # the output log level (trace, debug, info, warn, error, fatal)
 port        : "7410"                      # the connection port
 token       : ""                          # the secure token used to connect with (no auth by default)
 ```

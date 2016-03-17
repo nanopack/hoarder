@@ -40,11 +40,13 @@ func Start() error {
 	}
 
 	// blocking...
-	lumber.Info("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
+
 	switch viper.GetBool("insecure") {
 	case false:
+		lumber.Info("Starting secure hoarder server at '%s'...\n", viper.GetString("uri"))
 		return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
 	default:
+		lumber.Info("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
 		return http.ListenAndServe(viper.GetString("uri"), routes())
 	}
 }
