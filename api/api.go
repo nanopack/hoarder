@@ -40,8 +40,13 @@ func Start() error {
 	}
 
 	// blocking...
-	lumber.Debug("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
-	return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
+	lumber.Info("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
+	switch viper.GetBool("insecure") {
+	case false:
+		return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
+	default:
+		return http.ListenAndServe(viper.GetString("uri"), routes())
+	}
 }
 
 // setDriver

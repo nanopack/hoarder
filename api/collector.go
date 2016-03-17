@@ -28,7 +28,7 @@ func removeOldKeys() error {
 		// because no files, written by hoarder, will have a modified time before the
 		// Unix epoch began
 		if data.ModTime.Unix() < (now.Unix() - int64(viper.GetInt("clean-after"))) {
-			fmt.Printf("Cleaning key: %s\n", data.Name)
+			lumber.Debug("Cleaning key: ", data.Name)
 			if err := driver.Remove(data.Name); err != nil {
 				return fmt.Errorf("Cleaning of '%s' failed - %v", data.Name, err.Error())
 			}

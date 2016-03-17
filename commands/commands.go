@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/jcelliott/lumber"
@@ -35,25 +35,44 @@ var (
 		// driver to be used
 		PersistentPreRun: func(ccmd *cobra.Command, args []string) {
 
+			// convert the log level
+			logLvl := lumber.LvlInt(viper.GetString("log-level"))
+
 			// configure the logger
-			lumber.Level(lumber.LvlInt(viper.GetString("log_level")))
 			// lumber.Prefix("[hoader]")
+			switch viper.GetString("log-type") {
+			case "stdout":
+				lumber.Level(logLvl)
+			case "file":
+				// logger := lumber.NewFileLogger(viper.GetString("log-file"), logLvl, lumber.ROTATE, 5000, 1, 100)
+				// lumber.SetLogger(logger)
+			}
 
 			// if --config is passed, attempt to parse the config file
 			if config != "" {
 
+				// get the filepath
+				abs, err := filepath.Abs(config)
+				if err != nil {
+					lumber.Error("Error reading filepath: ", err.Error())
+				}
+
+				// get the config name
+				base := filepath.Base(abs)
+
+				// get the path
+				path := filepath.Dir(abs)
+
 				//
-				viper.SetConfigName("config")
-				viper.AddConfigPath(config)
+				viper.SetConfigName(strings.Split(base, ".")[0])
+				viper.AddConfigPath(path)
 
 				// Find and read the config file; Handle errors reading the config file
 				if err := viper.ReadInConfig(); err != nil {
-					panic(fmt.Errorf("Fatal error config file: %s \n", err))
+					lumber.Fatal("Failed to read config file: ", err.Error())
+					os.Exit(1)
 				}
 			}
-
-			// configure InsecureSkipVerify using setting from 'insecure' flag
-			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: viper.GetBool("insecure")}
 		},
 
 		// either run hoarder as a server, or run it as a CLI depending on what flags
@@ -65,7 +84,7 @@ var (
 
 				// enable/start garbage collection if age config was changed
 				if ccmd.Flag("clean-after").Changed {
-					fmt.Printf("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
+					lumber.Debug("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
 
 					viper.Set("garbage-collect", true)
 
@@ -75,7 +94,7 @@ var (
 
 				// start the API
 				if err := api.Start(); err != nil {
-					fmt.Println("Failed to start API!", err)
+					lumber.Fatal("Failed to start API: ", err.Error())
 					os.Exit(1)
 				}
 			}
@@ -95,6 +114,8 @@ func init() {
 	viper.SetDefault("garbage-collect", false)
 	viper.SetDefault("host", "127.0.0.1")
 	viper.SetDefault("insecure", true)
+	viper.SetDefault("log-type", "stdout")
+	viper.SetDefault("log-file", "/var/log/hoarder.log")
 	viper.SetDefault("log-level", "INFO")
 	viper.SetDefault("port", "7410")
 	viper.SetDefault("token", "")
@@ -108,6 +129,8 @@ func init() {
 	HoarderCmd.PersistentFlags().IntP("clean-after", "g", viper.GetInt("clean-after"), "Age data is deemed garbage (seconds)")
 	HoarderCmd.PersistentFlags().StringP("host", "H", viper.GetString("host"), "Hoarder hostname/IP")
 	HoarderCmd.PersistentFlags().BoolP("insecure", "i", viper.GetBool("insecure"), "Disable tls key checking")
+	HoarderCmd.PersistentFlags().String("log-type", viper.GetString("log-type"), "The type of logging (stdout/file)")
+	HoarderCmd.PersistentFlags().String("log-file", viper.GetString("log-file"), "Location to save logs")
 	HoarderCmd.PersistentFlags().String("log-level", viper.GetString("log-level"), "Hoarder output log level")
 	HoarderCmd.PersistentFlags().StringP("port", "p", viper.GetString("port"), "Hoarder port")
 	HoarderCmd.PersistentFlags().StringP("token", "t", viper.GetString("token"), "Hoarder auth token")
@@ -115,9 +138,11 @@ func init() {
 	//
 	viper.BindPFlag("backend", HoarderCmd.PersistentFlags().Lookup("backend"))
 	viper.BindPFlag("clean-after", HoarderCmd.PersistentFlags().Lookup("clean-after"))
-	viper.BindPFlag("log-level", HoarderCmd.PersistentFlags().Lookup("log-level"))
 	viper.BindPFlag("host", HoarderCmd.PersistentFlags().Lookup("host"))
 	viper.BindPFlag("insecure", HoarderCmd.PersistentFlags().Lookup("insecure"))
+	viper.BindPFlag("log-type", HoarderCmd.PersistentFlags().Lookup("log-type"))
+	viper.BindPFlag("log-file", HoarderCmd.PersistentFlags().Lookup("log-file"))
+	viper.BindPFlag("log-level", HoarderCmd.PersistentFlags().Lookup("log-level"))
 	viper.BindPFlag("port", HoarderCmd.PersistentFlags().Lookup("port"))
 	viper.BindPFlag("token", HoarderCmd.PersistentFlags().Lookup("token"))
 

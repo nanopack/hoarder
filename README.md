@@ -49,16 +49,18 @@ Use " [command] --help" for more information about a command.
 
 ## Configuration
 
-To configure hoarder, a config file can be passed with --config. Configuration read in through a file will overwrite the same configuration specified by a flag. If no config file is passed, and no flags are set, reasonable defaults will be used.
+To configure hoarder, a config.yml file can be passed with --config. Configuration read in through a file will overwrite the same configuration specified by a flag. If no config file is passed, and no flags are set, reasonable defaults will be used.
 
-```ini
-clean_after : 0               # the age that data is deemed garbage (seconds)
-backend     : "file://"       # the pluggable backend the api will use for storage
-host        : 127.0.0.1       # the connection host
-insecure    : true            # connect insecurely
-log_level   : "info"          # the output log level
-port        : "7410"          # the connection port
-token       : ""              # the secure token used to connect with (no auth by default)
+```yml
+clean_after : 0                           # the age that data is deemed garbage (seconds)
+backend     : "file:///var/db/hoarder"    # the pluggable backend the api will use for storage
+host        : 127.0.0.1                   # the connection host
+insecure    : true                        # connect insecurely
+log_type    : "stdout"                    # the type of logging
+log_file    : "/var/log/hoarder.log"      # the location of the log file
+log_level   : "info"                      # the output log level
+port        : "7410"                      # the connection port
+token       : ""                          # the secure token used to connect with (no auth by default)
 ```
 
 ## API:
