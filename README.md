@@ -34,17 +34,17 @@ Available Commands:
 
 Flags:
   -b, --backend="file://": Hoarder backend driver
-  -g, --clean-after=0: Age data is deemed garbage (seconds)
+  -g, --clean-after=0: Age, in seconds, after which data is deemed garbage
       --config="": /path/to/config.yml
   -h, --help[=false]: help for
   -H, --host="127.0.0.1": Hoarder hostname/IP
-  -i, --insecure[=true]: Disable tls key checking
-      --log-file="/var/log/hoarder.log": Location to save logs
-      --log-level="INFO": Hoarder output log level
-      --log-type="stdout": The type of logging (stdout/file)
+  -i, --insecure[=true]: Whether or not to start the Hoarder server with TLS
+      --log-file="/var/log/hoarder.log": If log-type=file, the /path/to/logfile
+      --log-level="INFO": Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
+      --log-type="stdout": The type of logging (stdout, file)
   -p, --port="7410": Hoarder port
       --server[=false]: Run hoarder as a server
-  -t, --token="": Hoarder auth token
+  -t, --token="": Auth token used when connecting to a secure Hoarder
   -v, --version[=false]: Display the current version of this CLI
 
 Use " [command] --help" for more information about a command.
@@ -61,7 +61,7 @@ host        : 127.0.0.1                   # the connection host
 insecure    : true                        # connect insecurely
 log_type    : "stdout"                    # the type of logging
 log_file    : "/var/log/hoarder.log"      # if log_type is "file" this is the location of the log file; ignored otherwise
-log_level   : "info"                      # the output log level (trace, debug, info, warn, error, fatal)
+log_level   : "INFO"                      # the output log level (trace, debug, info, warn, error, fatal)
 port        : "7410"                      # the connection port
 token       : ""                          # the secure token used to connect with (no auth by default)
 ```
