@@ -13,10 +13,13 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/nanopack/hoarder/backends"
+	"github.com/nanopack/hoarder/util"
 )
 
 // utilized by the various backends
 type (
+
+	// Driver ...
 	Driver interface {
 		Init() error
 		List() ([]backends.FileInfo, error)
@@ -30,7 +33,7 @@ type (
 //
 var driver Driver
 
-// Start
+// Start ...
 func Start() error {
 
 	// set, and initialize, the backend driver
@@ -43,11 +46,11 @@ func Start() error {
 
 	switch viper.GetBool("insecure") {
 	case false:
-		lumber.Info("Starting secure hoarder server at '%s'...\n", viper.GetString("uri"))
-		return nanoauth.ListenAndServeTLS(viper.GetString("uri"), viper.GetString("token"), routes())
+		lumber.Info("Starting secure hoarder server at '%s'...\n", util.GetURI())
+		return nanoauth.ListenAndServeTLS(util.GetURI(), viper.GetString("token"), routes())
 	default:
-		lumber.Info("Starting hoarder server at '%s'...\n", viper.GetString("uri"))
-		return http.ListenAndServe(viper.GetString("uri"), routes())
+		lumber.Info("Starting hoarder server at '%s'...\n", util.GetURI())
+		return http.ListenAndServe(util.GetURI(), routes())
 	}
 }
 

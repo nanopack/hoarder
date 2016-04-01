@@ -8,6 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/nanopack/hoarder/util"
 )
 
 var (
@@ -61,10 +63,10 @@ func show(ccmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("Showing: %s/blobs/%s\n", uri, key)
+	fmt.Printf("Showing: %s/blobs/%s\n", util.GetURI(), key)
 
 	//
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs/%s", uri, key), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs/%s", util.GetURI(), key), nil)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

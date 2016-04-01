@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,10 +21,7 @@ var (
 	daemon  bool   //
 	version bool   //
 
-	//
-	uri string
-
-	//
+	// HoarderCmd ...
 	HoarderCmd = &cobra.Command{
 		Use:   "",
 		Short: "",
@@ -119,10 +115,6 @@ func init() {
 	viper.SetDefault("log-level", "INFO")
 	viper.SetDefault("port", "7410")
 	viper.SetDefault("token", "")
-	viper.SetDefault("uri", fmt.Sprintf("%v:%v", viper.GetString("host"), viper.GetString("port")))
-
-	//
-	uri = fmt.Sprintf("%s:%s", viper.GetString("host"), viper.GetString("port"))
 
 	// persistent flags
 	HoarderCmd.PersistentFlags().StringP("backend", "b", viper.GetString("backend"), "Hoarder backend driver")
