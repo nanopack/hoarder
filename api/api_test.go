@@ -17,7 +17,9 @@ import (
 )
 
 var (
-	testAddr = "127.0.0.1:7411"
+	testHost = "127.0.0.1"
+	testPort = "7411"
+	testAddr = fmt.Sprintf("%s:%s", testHost, testPort)
 	testKey  = "testKey"
 	testData = "testData"
 )
@@ -27,7 +29,8 @@ func TestMain(m *testing.M) {
 	// manually configure
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	viper.Set("backend", "file:///tmp/hoarder_test")
-	viper.Set("uri", testAddr)
+	viper.Set("host", testHost)
+	viper.Set("port", testPort)
 
 	// empty test dir
 	os.RemoveAll("/tmp/hoarder_test")
