@@ -130,7 +130,7 @@ $ curl -k https://localhost:7410/blobs/test -X DELETE
 
 *Note*: all examples are run without auth. If auth was enabled when the server was started then an additional header needs to be present:
 
-`-H "x-auth-token: TOKEN"`
+`-H "X-AUTH-TOKEN: TOKEN"`
 
 ## Data
 
