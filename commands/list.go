@@ -32,7 +32,7 @@ func list(ccmd *cobra.Command, args []string) {
 	}
 
 	//
-	req.Header.Add("x-auth-token", viper.GetString("token"))
+	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
 
 	//
 	res, err := http.DefaultClient.Do(req)

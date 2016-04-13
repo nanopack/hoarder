@@ -47,6 +47,7 @@ func Start() error {
 	switch viper.GetBool("insecure") {
 	case false:
 		lumber.Info("Starting secure hoarder server at '%s'...\n", util.GetURI())
+		nanoauth.DefaultAuth.Header = "X-AUTH-TOKEN"
 		return nanoauth.ListenAndServeTLS(util.GetURI(), viper.GetString("token"), routes())
 	default:
 		lumber.Info("Starting hoarder server at '%s'...\n", util.GetURI())
@@ -127,10 +128,10 @@ func authenticate(fn http.HandlerFunc) http.HandlerFunc {
 			// param
 			var xtoken string
 			switch {
-			case req.Header.Get("x-auth-token") != "":
-				xtoken = req.Header.Get("x-auth-token")
-			case req.FormValue("x-auth-token") != "":
-				xtoken = req.FormValue("x-auth-token")
+			case req.Header.Get("X-AUTH-TOKEN") != "":
+				xtoken = req.Header.Get("X-AUTH-TOKEN")
+			case req.FormValue("X-AUTH-TOKEN") != "":
+				xtoken = req.FormValue("X-AUTH-TOKEN")
 			}
 
 			// if the tokens don't match then the connection is unauthorized
@@ -154,9 +155,9 @@ func handleRequest(fn http.HandlerFunc) http.HandlerFunc {
 		fn(rw, req)
 
 		// must be after fn if ever going to get rw.status (logging still more meaningful)
-		lumber.Debug(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "x-auth-token: %s\n"`,
+		lumber.Debug(`%v - [%v] %v %v %v(%s) - "User-Agent: %s", "X-AUTH-TOKEN: %s\n"`,
 			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
 			rw.Header().Get("status"), req.Header.Get("Content-Length"),
-			req.Header.Get("User-Agent"), req.Header.Get("x-auth-token"))
+			req.Header.Get("User-Agent"), req.Header.Get("X-AUTH-TOKEN"))
 	}
 }
