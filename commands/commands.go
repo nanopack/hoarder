@@ -103,29 +103,19 @@ var (
 
 func init() {
 
-	// set config defaults; these are overriden if a --config file is provided
-	// (see above)
-	viper.SetDefault("backend", "file://") // this is set to file here, and then in the filesystem backend defaults to the actual path
-	viper.SetDefault("clean-after", uint64(time.Now().Unix()))
+	// set config defaults
 	viper.SetDefault("garbage-collect", false)
-	viper.SetDefault("host", "127.0.0.1")
-	viper.SetDefault("insecure", true)
-	viper.SetDefault("log-type", "stdout")
-	viper.SetDefault("log-file", "/var/log/hoarder.log")
-	viper.SetDefault("log-level", "INFO")
-	viper.SetDefault("port", "7410")
-	viper.SetDefault("token", "")
 
 	// persistent flags
-	HoarderCmd.PersistentFlags().StringP("backend", "b", viper.GetString("backend"), "Hoarder backend driver")
-	HoarderCmd.PersistentFlags().IntP("clean-after", "g", viper.GetInt("clean-after"), "Age, in seconds, after which data is deemed garbage")
-	HoarderCmd.PersistentFlags().StringP("host", "H", viper.GetString("host"), "Hoarder hostname/IP")
-	HoarderCmd.PersistentFlags().BoolP("insecure", "i", viper.GetBool("insecure"), "Whether or not to start the Hoarder server with TLS")
-	HoarderCmd.PersistentFlags().String("log-type", viper.GetString("log-type"), "The type of logging (stdout, file)")
-	HoarderCmd.PersistentFlags().String("log-file", viper.GetString("log-file"), "If log-type=file, the /path/to/logfile; ignored otherwise")
-	HoarderCmd.PersistentFlags().String("log-level", viper.GetString("log-level"), "Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
-	HoarderCmd.PersistentFlags().StringP("port", "p", viper.GetString("port"), "Hoarder port")
-	HoarderCmd.PersistentFlags().StringP("token", "t", viper.GetString("token"), "Auth token used when connecting to a secure Hoarder")
+	HoarderCmd.PersistentFlags().StringP("backend", "b", "file://", "Hoarder backend driver")
+	HoarderCmd.PersistentFlags().Uint64P("clean-after", "g", uint64(time.Now().Unix()), "Age, in seconds, after which data is deemed garbage")
+	HoarderCmd.PersistentFlags().StringP("host", "H", "127.0.0.1", "Hoarder hostname/IP")
+	HoarderCmd.PersistentFlags().BoolP("insecure", "i", true, "Whether or not to start the Hoarder server with TLS")
+	HoarderCmd.PersistentFlags().String("log-type", "stdout", "The type of logging (stdout, file)")
+	HoarderCmd.PersistentFlags().String("log-file", "/var/log/hoarder.log", "If log-type=file, the /path/to/logfile; ignored otherwise")
+	HoarderCmd.PersistentFlags().String("log-level", "INFO", "Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
+	HoarderCmd.PersistentFlags().StringP("port", "p", "7410", "Hoarder port")
+	HoarderCmd.PersistentFlags().StringP("token", "t", "", "Auth token used when connecting to a secure Hoarder")
 
 	//
 	viper.BindPFlag("backend", HoarderCmd.PersistentFlags().Lookup("backend"))

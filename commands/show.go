@@ -22,7 +22,7 @@ var (
 		Short: "Display a file from the hoarder storage",
 		Long:  ``,
 
-		Run: remove,
+		Run: show,
 	}
 
 	// alias for show
@@ -33,7 +33,7 @@ var (
 		Short: "Display a file from the hoarder storage",
 		Long:  ``,
 
-		Run: remove,
+		Run: show,
 	}
 
 	//
