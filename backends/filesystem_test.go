@@ -51,12 +51,12 @@ func TestWrite(t *testing.T) {
 
 // test list
 func TestList(t *testing.T) {
-	fileInfo, err := driver.List()
+	DataInfo, err := driver.List()
 	if err != nil {
 		t.Error("Failed to LIST file - ", err)
 	}
-	if fileInfo[0].Name != "testfile" {
-		t.Error("Failed to LIST file - incorrect file found: %s", fileInfo[0].Name)
+	if DataInfo[0].Name != "testfile" {
+		t.Error("Failed to LIST file - incorrect file found: %s", DataInfo[0].Name)
 	}
 }
 
@@ -75,12 +75,12 @@ func TestRead(t *testing.T) {
 
 // test stat
 func TestStat(t *testing.T) {
-	fileInfo, err := driver.Stat("testfile")
+	DataInfo, err := driver.Stat("testfile")
 	if err != nil {
 		t.Error("Failed to STAT file - ", err)
 	}
-	if fileInfo.Size != 8 {
-		t.Errorf("Failed to STAT file - incorrect size: %d", fileInfo.Size)
+	if DataInfo.Size != 8 {
+		t.Errorf("Failed to STAT file - incorrect size: %d", DataInfo.Size)
 	}
 }
 

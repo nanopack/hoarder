@@ -1,6 +1,7 @@
 package backends
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -14,8 +15,8 @@ type Filesystem struct {
 	Path string // path to the local database (default)
 }
 
-// Init ensures the database exists before trying to do any operations on it
-func (d *Filesystem) Init() error {
+// initialize ensures the database exists before trying to do any operations on it
+func (d *Filesystem) initialize() error {
 	//
 	if d.Path == "" {
 		d.Path = DEFAULT_FILESYSTEM_PATH
@@ -25,8 +26,8 @@ func (d *Filesystem) Init() error {
 	return os.MkdirAll(d.Path, 0755)
 }
 
-// List returns a list of files, and some info, currently stored
-func (d Filesystem) List() ([]FileInfo, error) {
+// list returns a list of files, and some info, currently stored
+func (d Filesystem) list() ([]DataInfo, error) {
 
 	//
 	files, err := ioutil.ReadDir(d.Path)
@@ -35,17 +36,17 @@ func (d Filesystem) List() ([]FileInfo, error) {
 	}
 
 	//
-	info := []FileInfo{}
+	info := []DataInfo{}
 	for _, fi := range files {
-		info = append(info, FileInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()})
+		info = append(info, DataInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()})
 	}
 
 	//
 	return info, nil
 }
 
-// Read reads a file and returns the contents
-func (d Filesystem) Read(key string) (io.Reader, error) {
+// read reads a file and returns the contents
+func (d Filesystem) read(key string) (io.ReadCloser, error) {
 
 	//
 	f, err := os.Open(filepath.Join(d.Path, key))
@@ -57,33 +58,35 @@ func (d Filesystem) Read(key string) (io.Reader, error) {
 	return f, nil
 }
 
-// Remove removes a file
-func (d Filesystem) Remove(key string) error {
+// remove removes a file
+func (d Filesystem) remove(key string) error {
 	return os.RemoveAll(filepath.Join(d.Path, key))
 }
 
-// Stat returns information about a file
-func (d Filesystem) Stat(key string) (FileInfo, error) {
+// stat returns information about a file
+func (d Filesystem) stat(key string) (DataInfo, error) {
 
 	//
 	fi, err := os.Stat(filepath.Join(d.Path, key))
 	if err != nil {
-		return FileInfo{}, err
+		return DataInfo{}, err
 	}
 
 	//
-	return FileInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()}, nil
+	return DataInfo{Name: fi.Name(), Size: fi.Size(), ModTime: fi.ModTime().UTC()}, nil
 }
 
-// Write writes data do a file
-func (d Filesystem) Write(key string, r io.Reader) error {
-
-	// read the entire contents of the reader
-	b, err := ioutil.ReadAll(r)
+// write writes data to a file
+func (d Filesystem) write(key string, r io.Reader) error {
+	f, err := os.Create(filepath.Join(d.Path, key))
+	defer f.Close()
+	// defer r.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to open file to write - %v\n", err)
 	}
 
-	// create/truncate a file and write the contents to it
-	return ioutil.WriteFile(filepath.Join(d.Path, key), b, 0644)
+	// pipe contents of reader to file (save some rams)
+	_, err = io.Copy(f, r)
+
+	return err
 }

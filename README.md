@@ -22,8 +22,8 @@ Simply run `hoarder <COMMAND>`
 
 ```
 Usage:
-   [flags]
-   [command]
+  hoarder [flags]
+  hoarder [command]
 
 Available Commands:
   add         Add file to hoarder storage
@@ -33,21 +33,18 @@ Available Commands:
   update      Update a file in hoarder
 
 Flags:
-  -b, --backend="file://": Hoarder backend driver
-  -g, --clean-after=0: Age, in seconds, after which data is deemed garbage
-      --config="": /path/to/config.yml
-  -h, --help[=false]: help for
-  -H, --host="127.0.0.1": Hoarder hostname/IP
-  -i, --insecure[=true]: Whether or not to start the Hoarder server with TLS
-      --log-file="/var/log/hoarder.log": If log-type=file, the /path/to/logfile
-      --log-level="INFO": Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
-      --log-type="stdout": The type of logging (stdout, file)
-  -p, --port="7410": Hoarder port
-      --server[=false]: Run hoarder as a server
-  -t, --token="": Auth token used when connecting to a secure Hoarder
-  -v, --version[=false]: Display the current version of this CLI
+  -b, --backend string     Hoarder backend (default "file:///var/db/hoarder")
+  -g, --clean-after uint   Age, in seconds, after which data is deemed garbage (default time.Now())
+      --config string      /path/to/config.yml
+  -H, --host string        Hoarder hostname/IP (default "127.0.0.1")
+  -i, --insecure           Whether or not to start the Hoarder server with TLS (default true)
+      --log-level string   Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
+  -p, --port string        Hoarder port (default "7410")
+  -s, --server             Run hoarder as a server
+  -t, --token string       Auth token used when connecting to a secure Hoarder
+  -v, --version            Display the current version of this CLI
 
-Use " [command] --help" for more information about a command.
+Use "hoarder [command] --help" for more information about a command.
 ```
 
 ## Configuration
@@ -55,14 +52,13 @@ Use " [command] --help" for more information about a command.
 To configure hoarder, a config.yml file can be passed with --config. Configuration read in through a file will overwrite the same configuration specified by a flag. If no config file is passed, and no flags are set, reasonable defaults will be used.
 
 ```yml
-clean_after : 0                           # the age that data is deemed garbage (seconds)
 backend     : "file:///var/db/hoarder"    # the pluggable backend the api will use for storage
+clean-after : 0                           # the age that data is deemed garbage (seconds)
 host        : 127.0.0.1                   # the connection host
 insecure    : true                        # connect insecurely
-log_type    : "stdout"                    # the type of logging
-log_file    : "/var/log/hoarder.log"      # if log_type is "file" this is the location of the log file; ignored otherwise
-log_level   : "INFO"                      # the output log level (trace, debug, info, warn, error, fatal)
+log-level   : "INFO"                      # the output log level (trace, debug, info, warn, error, fatal)
 port        : "7410"                      # the connection port
+server      : false                       # run as a server
 token       : ""                          # the secure token used to connect with (no auth by default)
 ```
 
@@ -71,13 +67,13 @@ token       : ""                          # the secure token used to connect wit
 ```
 | Method |     Route     | Functionality |
 ------------------------------------------
-| GET    | /blobs"      | List all blobs
 | GET    | /blobs/{:id} | Retrieve a blob
+| HEAD   | /blobs/{:id} | Retrieve file information about a blob
 | POST   | /blobs/{:id} | Publish a new blob
 | PUT    | /blobs/{:id} | Update an existing blob
 | DELETE | /blobs/{:id} | Remove an existing blob
+| GET    | /blobs"      | List all blobs
 | HEAD   | /blobs"      | Retrieve file information for all blobs
-| HEAD   | /blobs/{:id} | Retrieve file information about a blob
 ```
 
 #### Examples
@@ -156,6 +152,10 @@ When it retrieves data it might look like the following:
 	"ModTime": "2016-03-01T21:13:57.534706044Z"
 }
 ```
+
+## Todo
+- rework cli and don't buffer
+- make collector its own package
 
 ## Contributing
 

@@ -3,39 +3,41 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
+
+	"github.com/nanopack/hoarder/backends"
 )
 
 // get returns the data corresponding to specified key
 func get(rw http.ResponseWriter, req *http.Request) {
 
 	//
-	r, err := driver.Read(req.URL.Query().Get(":blob"))
+	r, err := backends.Read(req.URL.Query().Get(":blob"))
+	defer r.Close() // close the file
 	if err != nil {
 		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
-	//
-	b, err := ioutil.ReadAll(r)
+	// pipe the file rather than consume the rams
+	_, err = io.Copy(rw, r)
 	if err != nil {
 		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
 
-	//
-	rw.Write(b)
+	rw.WriteHeader(200)
 }
 
 // getHead returns info pertaining to data corresponding to specified key
 func getHead(rw http.ResponseWriter, req *http.Request) {
 
-	//
-	fi, err := driver.Stat(req.URL.Query().Get(":blob"))
+	// get data information
+	fi, err := backends.Stat(req.URL.Query().Get(":blob"))
 	if err != nil {
 		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
@@ -57,7 +59,7 @@ func create(rw http.ResponseWriter, req *http.Request) {
 	key := req.URL.Query().Get(":blob")
 
 	//
-	if err := driver.Write(key, req.Body); err != nil {
+	if err := backends.Write(key, req.Body); err != nil {
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -77,7 +79,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 	key := req.URL.Query().Get(":blob")
 
 	//
-	if err := driver.Remove(key); err != nil {
+	if err := backends.Remove(key); err != nil {
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
@@ -90,7 +92,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 func list(rw http.ResponseWriter, req *http.Request) {
 
 	//
-	fis, err := driver.List()
+	fis, err := backends.List()
 	if err != nil {
 		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
