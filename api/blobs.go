@@ -15,12 +15,12 @@ func get(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	r, err := backends.Read(req.URL.Query().Get(":blob"))
-	defer r.Close() // close the file
 	if err != nil {
 		rw.WriteHeader(404)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
+	defer r.Close() // close the file
 
 	// pipe the file rather than consume the rams
 	_, err = io.Copy(rw, r)
@@ -29,8 +29,6 @@ func get(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
 		return
 	}
-
-	rw.WriteHeader(200)
 }
 
 // getHead returns info pertaining to data corresponding to specified key

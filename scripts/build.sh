@@ -21,7 +21,8 @@ getCurrTag() {
 
 # build hoarder
 echo "Building hoader..."
-gox -ldflags="-X main.version=$(getCurrTag) -X main.commit=$(getCurrCommit)" \
+gox -ldflags="-X github.com/nanopack/hoarder/commands.version=$(getCurrTag)
+  -X github.com/nanopack/hoarder/commands.commit=$(getCurrCommit)" \
   -osarch "darwin/amd64 linux/amd64 windows/amd64" -output="./build/{{.OS}}/{{.Arch}}/hoarder"
 
 # look through each os/arch/file and generate an md5 for each

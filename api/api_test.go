@@ -1,4 +1,4 @@
-package api
+package api_test
 
 import (
 	"bytes"
@@ -13,7 +13,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jcelliott/lumber"
 	"github.com/spf13/viper"
+
+	"github.com/nanopack/hoarder/api"
+	"github.com/nanopack/hoarder/backends"
 )
 
 var (
@@ -31,12 +35,15 @@ func TestMain(m *testing.M) {
 	viper.Set("backend", "file:///tmp/hoarder_test")
 	viper.Set("host", testHost)
 	viper.Set("port", testPort)
+	viper.Set("listen-addr", testAddr)
+	viper.Set("token", "secret")
+	lumber.Level(lumber.LvlInt("fatal"))
 
 	// empty test dir
 	os.RemoveAll("/tmp/hoarder_test")
-
+	backends.Initialize()
 	// start api
-	go Start()
+	go api.Start()
 	<-time.After(time.Second)
 	rtn := m.Run()
 
@@ -61,11 +68,11 @@ func TestAuth(t *testing.T) {
 
 	// make sure we weren't authorized to do the action
 	if res.StatusCode != 401 {
-		t.Fatalf("Unauthorized action!")
+		t.Fatalf("Unauthorized action! - %v", res.StatusCode)
 	}
 
 	// remove the token for the rest of the tests
-	viper.Set("token", "")
+	viper.Set("token", "secret")
 }
 
 // TestAddData
@@ -104,7 +111,12 @@ func TestUpdateData(t *testing.T) {
 func TestShowData(t *testing.T) {
 
 	//
-	res, err := do("GET", testKey, nil)
+	res, err := do("GET", "not-real", nil)
+	if res.StatusCode != 404 {
+		t.Fatalf("Got imaginary things - %v", res.StatusCode)
+	}
+
+	res, err = do("GET", testKey, nil)
 	if err != nil {
 		t.Fatalf("Failed to show data - %v", err.Error())
 	}
@@ -168,6 +180,7 @@ func TestRemoveData(t *testing.T) {
 // do
 func do(method, path string, body io.Reader) (*http.Response, error) {
 	req, _ := http.NewRequest(method, fmt.Sprintf("https://%s/blobs/%s", testAddr, path), body)
+	req.Header.Set("X-AUTH-TOKEN", viper.GetString("token"))
 	return http.DefaultClient.Do(req)
 }
 

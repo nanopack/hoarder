@@ -79,11 +79,11 @@ func (d Filesystem) stat(key string) (DataInfo, error) {
 // write writes data to a file
 func (d Filesystem) write(key string, r io.Reader) error {
 	f, err := os.Create(filepath.Join(d.Path, key))
-	defer f.Close()
-	// defer r.Close()
 	if err != nil {
 		return fmt.Errorf("Failed to open file to write - %v\n", err)
 	}
+	defer f.Close()
+	// defer r.Close()
 
 	// pipe contents of reader to file (save some rams)
 	_, err = io.Copy(f, r)
