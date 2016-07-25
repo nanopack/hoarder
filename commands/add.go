@@ -9,8 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/nanopack/hoarder/util"
 )
 
 var (
@@ -60,11 +58,11 @@ func add(ccmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Printf("Adding: %s/blobs/%s\n", util.GetURI(), key)
+	fmt.Printf("Adding: %s/blobs/%s\n", viper.GetString("listen-addr"), key)
 
 	//
 	body := bytes.NewBuffer([]byte(data))
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs/%s", util.GetURI(), key), body)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs/%s", viper.GetString("listen-addr"), key), body)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

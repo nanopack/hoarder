@@ -6,18 +6,22 @@ import (
 	"os"
 	"testing"
 
+	"github.com/spf13/viper"
+
 	"github.com/nanopack/hoarder/backends"
 )
 
 var (
 	fsPath = "/tmp/hoarder_fs_test"
-	driver = &backends.Filesystem{Path: fsPath}
 )
 
 func TestMain(m *testing.M) {
 
 	// start clean
 	os.RemoveAll(fsPath)
+
+	// configure
+	viper.Set("backend", fsPath)
 
 	// run
 	rtn := m.Run()
@@ -30,13 +34,9 @@ func TestMain(m *testing.M) {
 
 // test init
 func TestInit(t *testing.T) {
-	driver.Init()
+	backends.Initialize()
 	if _, err := os.Stat(fsPath); err != nil {
 		t.Error("Failed to INIT filesystem - ", err)
-	}
-
-	if driver.Path != fsPath {
-		t.Error("Failed to INIT filesystem - bad Path setting")
 	}
 }
 
@@ -44,25 +44,25 @@ func TestInit(t *testing.T) {
 func TestWrite(t *testing.T) {
 	reader := bytes.NewBuffer([]byte("testdata"))
 
-	if err := driver.Write("testfile", reader); err != nil {
+	if err := backends.Write("testfile", reader); err != nil {
 		t.Error("Failed to WRITE file - ", err)
 	}
 }
 
 // test list
 func TestList(t *testing.T) {
-	fileInfo, err := driver.List()
+	DataInfo, err := backends.List()
 	if err != nil {
 		t.Error("Failed to LIST file - ", err)
 	}
-	if fileInfo[0].Name != "testfile" {
-		t.Error("Failed to LIST file - incorrect file found: %s", fileInfo[0].Name)
+	if DataInfo[0].Name != "testfile" {
+		t.Error("Failed to LIST file - incorrect file found: %s", DataInfo[0].Name)
 	}
 }
 
 // test read
 func TestRead(t *testing.T) {
-	reader, err := driver.Read("testfile")
+	reader, err := backends.Read("testfile")
 	if err != nil {
 		t.Error("Failed to READ file - ", err)
 	}
@@ -75,18 +75,18 @@ func TestRead(t *testing.T) {
 
 // test stat
 func TestStat(t *testing.T) {
-	fileInfo, err := driver.Stat("testfile")
+	DataInfo, err := backends.Stat("testfile")
 	if err != nil {
 		t.Error("Failed to STAT file - ", err)
 	}
-	if fileInfo.Size != 8 {
-		t.Errorf("Failed to STAT file - incorrect size: %d", fileInfo.Size)
+	if DataInfo.Size != 8 {
+		t.Errorf("Failed to STAT file - incorrect size: %d", DataInfo.Size)
 	}
 }
 
 // test remove
 func TestRemove(t *testing.T) {
-	err := driver.Remove("testfile")
+	err := backends.Remove("testfile")
 	if err != nil {
 		t.Error("Failed to REMOVE file - ", err)
 	}
@@ -94,7 +94,7 @@ func TestRemove(t *testing.T) {
 
 // ensure remove idempotency
 func TestRemove2(t *testing.T) {
-	err := driver.Remove("testfile")
+	err := backends.Remove("testfile")
 	if err != nil {
 		t.Error("Failed to REMOVE file - ", err)
 	}

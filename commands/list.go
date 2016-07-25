@@ -8,8 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/nanopack/hoarder/util"
 )
 
 var listCmd = &cobra.Command{
@@ -23,10 +21,10 @@ var listCmd = &cobra.Command{
 // list utilizes the api to retrieve a list of all keys with associated info
 func list(ccmd *cobra.Command, args []string) {
 
-	fmt.Printf("Listing: %s/blobs\n", util.GetURI())
+	fmt.Printf("Listing: %s/blobs\n", viper.GetString("listen-addr"))
 
 	//
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs", util.GetURI()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs", viper.GetString("listen-addr")), nil)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
