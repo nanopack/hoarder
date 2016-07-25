@@ -42,6 +42,7 @@ func includeAddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "The filename of the raw data to be stored")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
 }
 
 // add utilizes the api to add data corresponding to a specified key
@@ -76,7 +77,5 @@ func add(ccmd *cobra.Command, args []string) {
 		body = f
 	}
 
-	b := rest("POST", "/"+key, body)
-
-	io.Copy(os.Stdout, b)
+	io.Copy(os.Stdout, rest("POST", "/"+key, body))
 }

@@ -4,6 +4,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/gorilla/pat"
@@ -14,18 +15,24 @@ import (
 
 // Start starts the api listener
 func Start() error {
+
+	u, err := url.Parse(viper.GetString("listen-addr"))
+	if err != nil {
+		return fmt.Errorf("Failed to parse db connection - %v", err)
+	}
+
 	// blocking...
 	nanoauth.DefaultAuth.Header = "X-AUTH-TOKEN"
 
 	// listen http (with auth support)
-	if !viper.GetBool("insecure") {
-		lumber.Info("Starting secure hoarder server at 'https://%s'...", viper.GetString("listen-addr"))
-		return nanoauth.ListenAndServeTLS(viper.GetString("listen-addr"), viper.GetString("token"), routes(), "/ping")
+	if u.Scheme == "http" {
+		lumber.Info("Starting hoarder server at 'http://%s'...", u.Host)
+		return nanoauth.ListenAndServe(u.Host, viper.GetString("token"), routes(), "/ping")
 	}
 
 	// listen https
-	lumber.Info("Starting hoarder server at 'http://%s'...", viper.GetString("listen-addr"))
-	return nanoauth.ListenAndServe(viper.GetString("listen-addr"), viper.GetString("token"), routes(), "/ping")
+	lumber.Info("Starting secure hoarder server at 'https://%s'...", u.Host)
+	return nanoauth.ListenAndServeTLS(u.Host, viper.GetString("token"), routes(), "/ping")
 }
 
 // routes registers all api routes with the router

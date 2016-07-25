@@ -53,6 +53,7 @@ func includeShowFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "The filename to save the raw data to")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
 }
 
 // show utilizes the api to show data associated to key
@@ -71,7 +72,7 @@ func show(ccmd *cobra.Command, args []string) {
 	if file != "" {
 		f, err := os.Create(file)
 		if err != nil {
-			fmt.Printf("Failed to open file to write - %v\n", err)
+			fmt.Fprintf(os.Stderr, "Failed to open file to write - %v\n", err)
 			return
 		}
 		defer f.Close()
@@ -79,4 +80,8 @@ func show(ccmd *cobra.Command, args []string) {
 	}
 
 	io.Copy(out, rest("GET", "/"+key, nil))
+
+	if file != "" {
+		fmt.Fprintln(os.Stderr, "Finished writing file")
+	}
 }

@@ -52,6 +52,7 @@ func init() {
 func includeRemoveFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
 }
 
 // remove utilizes the api to remove a key and associated data

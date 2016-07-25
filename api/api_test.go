@@ -21,9 +21,7 @@ import (
 )
 
 var (
-	testHost = "127.0.0.1"
-	testPort = "7411"
-	testAddr = fmt.Sprintf("%s:%s", testHost, testPort)
+	testAddr = "https://127.0.0.1:7411"
 	testKey  = "testKey"
 	testData = "testData"
 )
@@ -33,8 +31,6 @@ func TestMain(m *testing.M) {
 	// manually configure
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	viper.Set("backend", "file:///tmp/hoarder_test")
-	viper.Set("host", testHost)
-	viper.Set("port", testPort)
 	viper.Set("listen-addr", testAddr)
 	viper.Set("token", "secret")
 	lumber.Level(lumber.LvlInt("fatal"))
@@ -179,7 +175,7 @@ func TestRemoveData(t *testing.T) {
 
 // do
 func do(method, path string, body io.Reader) (*http.Response, error) {
-	req, _ := http.NewRequest(method, fmt.Sprintf("https://%s/blobs/%s", testAddr, path), body)
+	req, _ := http.NewRequest(method, fmt.Sprintf("%s/blobs/%s", testAddr, path), body)
 	req.Header.Set("X-AUTH-TOKEN", viper.GetString("token"))
 	return http.DefaultClient.Do(req)
 }

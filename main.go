@@ -18,16 +18,14 @@
 //    update      Update a file in hoarder
 //
 //  Flags:
-//    -b, --backend string     Hoarder backend (default "file:///var/db/hoarder")
-//    -g, --clean-after uint   Age, in seconds, after which data is deemed garbage (default 1469218560)
-//        --config string      /path/to/config.yml
-//    -H, --host string        Hoarder hostname/IP (default "127.0.0.1")
-//    -i, --insecure           Whether or not to start the Hoarder server with TLS (default true)
-//        --log-level string   Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
-//    -p, --port string        Hoarder port (default "7410")
-//    -s, --server             Run hoarder as a server
-//    -t, --token string       Auth token used when connecting to a secure Hoarder
-//    -v, --version            Display the current version of this CLI
+//    -b, --backend string       Hoarder backend (default "file:///var/db/hoarder")
+//    -g, --clean-after uint     Age, in seconds, after which data is deemed garbage (default 0)
+//        --config string        /path/to/config.yml
+//    -H, --listen-addr string   Hoarder listen uri (scheme defaults to https) (default "https://127.0.0.1:7410")
+//        --log-level string     Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
+//    -s, --server               Run hoarder as a server
+//    -t, --token string         Auth token used when connecting to a secure Hoarder
+//    -v, --version              Display the current version of this CLI
 //
 //  Use "hoarder [command] --help" for more information about a command.
 //
