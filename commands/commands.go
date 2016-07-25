@@ -2,7 +2,11 @@
 package commands
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -12,9 +16,17 @@ import (
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/backends"
+	"github.com/nanopack/hoarder/collector"
 )
 
 var (
+	body    io.ReadWriter // what to read/write requests body
+	verbose bool          // whether to display request info
+
+	key  string // blob key
+	data string // blob raw data (or '-' for stdin)
+	file string // blob file location
+
 	config   string // config file location
 	daemon   bool   // whether to run as server or not
 	showVers bool   // whether to print version info or not
@@ -68,7 +80,7 @@ func preFlight(ccmd *cobra.Command, args []string) error {
 	// if --version is passed print the version info
 	if showVers {
 		fmt.Printf("hoarder %s (%s)\n", version, commit)
-		return fmt.Errorf("")
+		return fmt.Errorf("ERRORRRR")
 	}
 
 	// if --server is not passed, print help
@@ -93,7 +105,7 @@ func startHoarder(ccmd *cobra.Command, args []string) error {
 		lumber.Debug("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
 
 		// start garbage collector
-		go api.StartCollection()
+		go collector.Start()
 	}
 
 	// set, and initialize, the backend driver
@@ -159,4 +171,49 @@ func init() {
 	HoarderCmd.AddCommand(destroyCmd)
 	HoarderCmd.AddCommand(fetchCmd)
 	HoarderCmd.AddCommand(getCmd)
+}
+
+func rest(_method, _key string, _body io.ReadWriter) io.Reader {
+	if verbose {
+		fmt.Fprintf(os.Stderr, "%s: %s/blobs%s", _method, viper.GetString("listen-addr"), _key)
+	}
+
+	req, err := http.NewRequest(_method, fmt.Sprintf("%s/blobs%s", "https://"+viper.GetString("listen-addr"), _key), _body)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to create request")
+	}
+
+	if viper.GetBool("insecure") {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
+	// set auth token
+	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
+
+	// make request to hoarder server
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// try again with http
+		req, er := http.NewRequest(_method, fmt.Sprintf("%s/blobs%s", "http://"+viper.GetString("listen-addr"), _key), _body)
+		if er != nil {
+			fmt.Fprintf(os.Stderr, "Failed to create request - %v\n", er)
+		}
+
+		// set auth token
+		req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
+
+		var err2 error
+		res, err2 = http.DefaultClient.Do(req)
+		if err2 != nil {
+			// print original error and exit
+			fmt.Fprintln(os.Stderr, "Failed to make request - %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if verbose {
+		fmt.Fprintf(os.Stderr, "%5d\n", res.StatusCode)
+	}
+
+	return res.Body
 }

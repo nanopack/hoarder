@@ -3,12 +3,10 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var updateCmd = &cobra.Command{
@@ -21,50 +19,42 @@ var updateCmd = &cobra.Command{
 
 // init
 func init() {
-	updateCmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
-	updateCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
+	includeAddFlags(updateCmd)
 }
 
-// update utilizes the api to update a key with specified data
+// update utilizes the api to update a key with specified data (`add` but with a `PUT` instead of a `POST`)
 func update(ccmd *cobra.Command, args []string) {
 
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to update")
+		fmt.Fprintln(os.Stderr, "Missing key - please provide the key for the record you'd like to update")
 		return
 	case data == "":
-		fmt.Println("Missing data - please provide the data that you would like to update")
+		fmt.Fprintln(os.Stderr, "Missing data - please provide the data that you would like to update")
 		return
 	}
 
-	fmt.Printf("Updating: %s/blobs/%s\n", viper.GetString("listen-addr"), key)
-
-	//
-	body := bytes.NewBuffer([]byte(data))
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/blobs/%s", viper.GetString("listen-addr"), key), body)
-	if err != nil {
-		fmt.Println(err.Error())
+	// use stdin as data to send if "-" is specified on command line `-d -`
+	if data == "-" {
+		body = os.Stdin
+	} else {
+		// todo: no buffer?
+		body = bytes.NewBuffer([]byte(data))
 	}
 
-	//
-	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
-
-	//
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// most often occurs due to server not listening, Exit to keep output clean
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	defer res.Body.Close()
-
-	//
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err.Error())
+	// if file is specified, use that instead of any `-d`
+	if file != "" {
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Printf("Failed to open file to read - %v\n", err)
+			return
+		}
+		defer f.Close()
+		body = f
 	}
 
-	//
-	fmt.Print(string(b))
+	b := rest("PUT", "/"+key, body)
+
+	io.Copy(os.Stdout, b)
 }
