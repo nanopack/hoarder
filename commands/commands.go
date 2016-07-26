@@ -22,7 +22,7 @@ import (
 var (
 	body     io.ReadWriter        // what to read/write requests body
 	verbose  bool                 // whether to display request info
-	insecure bool          = true // whether to verify cert or not
+	insecure bool          = true // whether to ignore cert or not
 
 	key  string // blob key
 	data string // blob raw data (or '-' for stdin)
@@ -78,7 +78,7 @@ func preFlight(ccmd *cobra.Command, args []string) error {
 	// if --version is passed print the version info
 	if showVers {
 		fmt.Printf("hoarder %s (%s)\n", version, commit)
-		return fmt.Errorf("ERRORRRR")
+		return fmt.Errorf("")
 	}
 
 	// if --server is not passed, print help

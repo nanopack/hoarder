@@ -42,7 +42,7 @@ func includeAddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "The filename of the raw data to be stored")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
-	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
 }
 
 // add utilizes the api to add data corresponding to a specified key

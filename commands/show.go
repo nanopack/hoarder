@@ -53,7 +53,7 @@ func includeShowFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&key, "key", "k", "", "The key to get the data by")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "The filename to save the raw data to")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
-	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
 }
 
 // show utilizes the api to show data associated to key

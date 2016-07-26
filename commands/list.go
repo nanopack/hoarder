@@ -17,7 +17,7 @@ var listCmd = &cobra.Command{
 
 func init() {
 	listCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
-	listCmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to verify hoarder certificate.")
+	listCmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
 }
 
 // list utilizes the api to retrieve a list of all keys with associated info
