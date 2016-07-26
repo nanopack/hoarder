@@ -1,13 +1,10 @@
 package commands
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var listCmd = &cobra.Command{
@@ -18,35 +15,12 @@ var listCmd = &cobra.Command{
 	Run: list,
 }
 
+func init() {
+	listCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	listCmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
+}
+
 // list utilizes the api to retrieve a list of all keys with associated info
 func list(ccmd *cobra.Command, args []string) {
-
-	fmt.Printf("Listing: %s/blobs\n", viper.GetString("listen-addr"))
-
-	//
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blobs", viper.GetString("listen-addr")), nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	//
-	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
-
-	//
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// most often occurs due to server not listening, Exit to keep output clean
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	defer res.Body.Close()
-
-	//
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	//
-	fmt.Print(string(b))
+	io.Copy(os.Stdout, rest("GET", "/", nil))
 }

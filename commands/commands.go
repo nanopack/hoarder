@@ -2,7 +2,11 @@
 package commands
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -12,9 +16,18 @@ import (
 
 	"github.com/nanopack/hoarder/api"
 	"github.com/nanopack/hoarder/backends"
+	"github.com/nanopack/hoarder/collector"
 )
 
 var (
+	body     io.ReadWriter        // what to read/write requests body
+	verbose  bool                 // whether to display request info
+	insecure bool          = true // whether to ignore cert or not
+
+	key  string // blob key
+	data string // blob raw data (or '-' for stdin)
+	file string // blob file location
+
 	config   string // config file location
 	daemon   bool   // whether to run as server or not
 	showVers bool   // whether to print version info or not
@@ -58,9 +71,6 @@ func readConfig(ccmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// simplify hoarder uri
-	viper.Set("listen-addr", fmt.Sprintf("%v:%v", viper.GetString("host"), viper.GetString("port")))
-
 	return nil
 }
 
@@ -93,7 +103,7 @@ func startHoarder(ccmd *cobra.Command, args []string) error {
 		lumber.Debug("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
 
 		// start garbage collector
-		go api.StartCollection()
+		go collector.Start()
 	}
 
 	// set, and initialize, the backend driver
@@ -115,19 +125,15 @@ func init() {
 	// set config defaults
 	backend := "file:///var/db/hoarder"
 	cleanAfter := uint64(time.Now().Unix())
-	host := "127.0.0.1"
-	insecure := true
+	listenAddr := "https://127.0.0.1:7410"
 	logLevel := "INFO"
-	port := "7410"
 	token := ""
 	server := false
 
 	// cli flags
 	HoarderCmd.PersistentFlags().StringP("backend", "b", backend, "Hoarder backend")
 	HoarderCmd.PersistentFlags().Uint64P("clean-after", "g", cleanAfter, "Age, in seconds, after which data is deemed garbage")
-	HoarderCmd.PersistentFlags().StringP("host", "H", host, "Hoarder hostname/IP")
-	HoarderCmd.PersistentFlags().StringP("port", "p", port, "Hoarder port")
-	HoarderCmd.PersistentFlags().BoolP("insecure", "i", insecure, "Whether or not to start the Hoarder server with TLS")
+	HoarderCmd.PersistentFlags().StringP("listen-addr", "H", listenAddr, "Hoarder listen uri (scheme defaults to https)")
 	HoarderCmd.PersistentFlags().String("log-level", logLevel, "Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL)")
 	HoarderCmd.PersistentFlags().StringP("token", "t", token, "Auth token used when connecting to a secure Hoarder")
 	HoarderCmd.Flags().BoolP("server", "s", server, "Run hoarder as a server")
@@ -135,15 +141,13 @@ func init() {
 	// bind config to cli flags
 	viper.BindPFlag("backend", HoarderCmd.PersistentFlags().Lookup("backend"))
 	viper.BindPFlag("clean-after", HoarderCmd.PersistentFlags().Lookup("clean-after"))
-	viper.BindPFlag("host", HoarderCmd.PersistentFlags().Lookup("host"))
-	viper.BindPFlag("port", HoarderCmd.PersistentFlags().Lookup("port"))
-	viper.BindPFlag("insecure", HoarderCmd.PersistentFlags().Lookup("insecure"))
+	viper.BindPFlag("listen-addr", HoarderCmd.PersistentFlags().Lookup("listen-addr"))
 	viper.BindPFlag("log-level", HoarderCmd.PersistentFlags().Lookup("log-level"))
 	viper.BindPFlag("token", HoarderCmd.PersistentFlags().Lookup("token"))
 	viper.BindPFlag("server", HoarderCmd.Flags().Lookup("server"))
 
 	// cli-only flags
-	HoarderCmd.Flags().StringVar(&config, "config", "", "/path/to/config.yml")
+	HoarderCmd.Flags().StringVarP(&config, "config", "c", "", "Path to config file (with extension)")
 	HoarderCmd.Flags().BoolVarP(&showVers, "version", "v", false, "Display the current version of this CLI")
 
 	// commands
@@ -159,4 +163,35 @@ func init() {
 	HoarderCmd.AddCommand(destroyCmd)
 	HoarderCmd.AddCommand(fetchCmd)
 	HoarderCmd.AddCommand(getCmd)
+}
+
+func rest(_method, _key string, _body io.ReadWriter) io.Reader {
+	if verbose {
+		fmt.Fprintf(os.Stderr, "%s: %s/blobs%s", _method, viper.GetString("listen-addr"), _key)
+	}
+
+	req, err := http.NewRequest(_method, fmt.Sprintf("%s/blobs%s", viper.GetString("listen-addr"), _key), _body)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to create request")
+	}
+
+	// skip cert check or not (only applies to https)
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: insecure}
+
+	// set auth token
+	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
+
+	// make request to hoarder server
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// print error and exit
+		fmt.Fprintf(os.Stderr, "Failed to make request - %v\n", err)
+		os.Exit(1)
+	}
+
+	if verbose {
+		fmt.Fprintf(os.Stderr, "%5d\n", res.StatusCode)
+	}
+
+	return res.Body
 }

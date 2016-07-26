@@ -3,18 +3,13 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
-	key  string
-	data string
-
 	//
 	addCmd = &cobra.Command{
 		Use:   "add",
@@ -38,11 +33,16 @@ var (
 
 // init
 func init() {
-	addCmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
-	addCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
+	includeAddFlags(addCmd)
+	includeAddFlags(createCmd)
+}
 
-	createCmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
-	createCmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
+func includeAddFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&key, "key", "k", "", "The key to store the data by")
+	cmd.Flags().StringVarP(&data, "data", "d", "", "The raw data to be stored")
+	cmd.Flags().StringVarP(&file, "file", "f", "", "The filename of the raw data to be stored")
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
 }
 
 // add utilizes the api to add data corresponding to a specified key
@@ -51,40 +51,31 @@ func add(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		fmt.Fprintln(os.Stderr, "Missing key - please provide the key for the record you'd like to create")
 		return
-	case data == "":
-		fmt.Println("Missing data - please provide the data that you would like to create")
+	case data == "" && file == "":
+		fmt.Fprintln(os.Stderr, "Missing data - please provide the data that you would like to create")
 		return
 	}
 
-	fmt.Printf("Adding: %s/blobs/%s\n", viper.GetString("listen-addr"), key)
-
-	//
-	body := bytes.NewBuffer([]byte(data))
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/blobs/%s", viper.GetString("listen-addr"), key), body)
-	if err != nil {
-		fmt.Println(err.Error())
+	// use stdin as data to send if "-" is specified on command line `-d -`
+	if data == "-" {
+		body = os.Stdin
+	} else {
+		// todo: no buffer?
+		body = bytes.NewBuffer([]byte(data))
 	}
 
-	//
-	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
-
-	//
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// most often occurs due to server not listening, Exit to keep output clean
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	defer res.Body.Close()
-
-	//
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err.Error())
+	// if file is specified, use that instead of any `-d`
+	if file != "" {
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to open file to read - %v\n", err)
+			return
+		}
+		defer f.Close()
+		body = f
 	}
 
-	//
-	fmt.Print(string(b))
+	io.Copy(os.Stdout, rest("POST", "/"+key, body))
 }

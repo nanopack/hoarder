@@ -2,12 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -46,9 +44,15 @@ var (
 
 // init
 func init() {
-	deleteCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
-	destroyCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
-	removeCmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
+	includeRemoveFlags(deleteCmd)
+	includeRemoveFlags(destroyCmd)
+	includeRemoveFlags(removeCmd)
+}
+
+func includeRemoveFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&key, "key", "k", "", "The key to remove the data by")
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Print more information about request")
+	cmd.Flags().BoolVarP(&insecure, "insecure", "i", insecure, "Whether or not to ignore hoarder certificate.")
 }
 
 // remove utilizes the api to remove a key and associated data
@@ -57,36 +61,9 @@ func remove(ccmd *cobra.Command, args []string) {
 	// handle any missing args
 	switch {
 	case key == "":
-		fmt.Println("Missing key - please provide the key for the record you'd like to create")
+		fmt.Fprintln(os.Stderr, "Missing key - please provide the key for the record you'd like to remove")
 		return
 	}
 
-	fmt.Printf("Removing: %s/blobls/%s\n", viper.GetString("listen-addr"), key)
-
-	//
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/blobs/%s", viper.GetString("listen-addr"), key), nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	//
-	req.Header.Add("X-AUTH-TOKEN", viper.GetString("token"))
-
-	//
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// most often occurs due to server not listening, Exit to keep output clean
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	defer res.Body.Close()
-
-	//
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	//
-	fmt.Print(string(b))
+	io.Copy(os.Stdout, rest("DELETE", "/"+key, nil))
 }

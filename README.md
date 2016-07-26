@@ -1,5 +1,6 @@
 [![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)  
 [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
+[![GoDoc](https://godoc.org/github.com/nanopack/hoarder?status.svg)](https://godoc.org/github.com/nanopack/hoarder)
 
 Hoarder is a simple, api-driven, storage system for storing anything for cloud based deployment services.
 
@@ -33,16 +34,14 @@ Available Commands:
   update      Update a file in hoarder
 
 Flags:
-  -b, --backend string     Hoarder backend (default "file:///var/db/hoarder")
-  -g, --clean-after uint   Age, in seconds, after which data is deemed garbage (default time.Now())
-      --config string      /path/to/config.yml
-  -H, --host string        Hoarder hostname/IP (default "127.0.0.1")
-  -i, --insecure           Whether or not to start the Hoarder server with TLS (default true)
-      --log-level string   Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
-  -p, --port string        Hoarder port (default "7410")
-  -s, --server             Run hoarder as a server
-  -t, --token string       Auth token used when connecting to a secure Hoarder
-  -v, --version            Display the current version of this CLI
+  -b, --backend string       Hoarder backend (default "file:///var/db/hoarder")
+  -g, --clean-after uint     Age, in seconds, after which data is deemed garbage (default 0)
+  -c, --config string        Path to config file (with extension)
+  -H, --listen-addr string   Hoarder listen uri (scheme defaults to https) (default "https://127.0.0.1:7410")
+      --log-level string     Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
+  -s, --server               Run hoarder as a server
+  -t, --token string         Auth token used when connecting to a secure Hoarder
+  -v, --version              Display the current version of this CLI
 
 Use "hoarder [command] --help" for more information about a command.
 ```
@@ -53,11 +52,8 @@ To configure hoarder, a config.yml file can be passed with --config. Configurati
 
 ```yml
 backend     : "file:///var/db/hoarder"    # the pluggable backend the api will use for storage
-clean-after : 0                           # the age that data is deemed garbage (seconds)
-host        : 127.0.0.1                   # the connection host
-insecure    : true                        # connect insecurely
+listen-addr : "https://127.0.0.1:7410"    # the connection host uri (scheme defaults to https)
 log-level   : "INFO"                      # the output log level (trace, debug, info, warn, error, fatal)
-port        : "7410"                      # the connection port
 server      : false                       # run as a server
 token       : ""                          # the secure token used to connect with (no auth by default)
 ```
@@ -72,8 +68,8 @@ token       : ""                          # the secure token used to connect wit
 | POST   | /blobs/{:id} | Publish a new blob
 | PUT    | /blobs/{:id} | Update an existing blob
 | DELETE | /blobs/{:id} | Remove an existing blob
-| GET    | /blobs"      | List all blobs
-| HEAD   | /blobs"      | Retrieve file information for all blobs
+| GET    | /blobs       | List all blobs
+| HEAD   | /blobs       | Retrieve file information for all blobs
 ```
 
 #### Examples
@@ -154,8 +150,6 @@ When it retrieves data it might look like the following:
 ```
 
 ## Todo
-- rework cli and don't buffer
-- make collector its own package
 
 ## Contributing
 

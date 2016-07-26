@@ -1,4 +1,5 @@
-package api
+// Package collector handles the cleanup of old stored data.
+package collector
 
 import (
 	"fmt"
@@ -40,8 +41,8 @@ func removeOldKeys() error {
 	return nil
 }
 
-// StartCollection calls removeOldKeys at set intervals
-func StartCollection() {
+// Start calls removeOldKeys at set intervals
+func Start() {
 	tick := time.Tick(CLEAN_FREQ * time.Second)
 
 	for _ = range tick {
