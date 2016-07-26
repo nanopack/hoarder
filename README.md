@@ -36,7 +36,7 @@ Available Commands:
 Flags:
   -b, --backend string       Hoarder backend (default "file:///var/db/hoarder")
   -g, --clean-after uint     Age, in seconds, after which data is deemed garbage (default 0)
-      --config string        /path/to/config.yml
+  -c, --config string        Path to config file (with extension)
   -H, --listen-addr string   Hoarder listen uri (scheme defaults to https) (default "https://127.0.0.1:7410")
       --log-level string     Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
   -s, --server               Run hoarder as a server
@@ -52,7 +52,6 @@ To configure hoarder, a config.yml file can be passed with --config. Configurati
 
 ```yml
 backend     : "file:///var/db/hoarder"    # the pluggable backend the api will use for storage
-clean-after : 0                           # the age that data is deemed garbage (seconds)
 listen-addr : "https://127.0.0.1:7410"    # the connection host uri (scheme defaults to https)
 log-level   : "INFO"                      # the output log level (trace, debug, info, warn, error, fatal)
 server      : false                       # run as a server
@@ -69,8 +68,8 @@ token       : ""                          # the secure token used to connect wit
 | POST   | /blobs/{:id} | Publish a new blob
 | PUT    | /blobs/{:id} | Update an existing blob
 | DELETE | /blobs/{:id} | Remove an existing blob
-| GET    | /blobs"      | List all blobs
-| HEAD   | /blobs"      | Retrieve file information for all blobs
+| GET    | /blobs       | List all blobs
+| HEAD   | /blobs       | Retrieve file information for all blobs
 ```
 
 #### Examples

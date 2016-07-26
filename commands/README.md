@@ -25,7 +25,7 @@ Available Commands:
 Flags:
   -b, --backend string       Hoarder backend (default "file:///var/db/hoarder")
   -g, --clean-after uint     Age, in seconds, after which data is deemed garbage (default 0)
-      --config string        /path/to/config.yml
+  -c, --config string        Path to config file (with extension)
   -H, --listen-addr string   Hoarder listen uri (scheme defaults to https) (default "https://127.0.0.1:7410")
       --log-level string     Output level of logs (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) (default "INFO")
   -s, --server               Run hoarder as a server

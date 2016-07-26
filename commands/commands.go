@@ -147,7 +147,7 @@ func init() {
 	viper.BindPFlag("server", HoarderCmd.Flags().Lookup("server"))
 
 	// cli-only flags
-	HoarderCmd.Flags().StringVar(&config, "config", "", "/path/to/config.yml")
+	HoarderCmd.Flags().StringVarP(&config, "config", "c", "", "Path to config file (with extension)")
 	HoarderCmd.Flags().BoolVarP(&showVers, "version", "v", false, "Display the current version of this CLI")
 
 	// commands
