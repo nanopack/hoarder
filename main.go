@@ -33,10 +33,14 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/nanopack/hoarder/commands"
 )
 
-//
 func main() {
-	commands.HoarderCmd.Execute()
+	err := commands.HoarderCmd.Execute()
+	if err != nil && err.Error() != "" {
+		fmt.Println(err)
+	}
 }

@@ -17,7 +17,7 @@ import (
 func Start() error {
 	uri, err := url.Parse(viper.GetString("listen-addr"))
 	if err != nil {
-		return fmt.Errorf("Failed to parse 'listen-addr' - %v", err)
+		return fmt.Errorf("Failed to parse 'listen-addr' - %s", err)
 	}
 
 	// blocking...
@@ -78,9 +78,9 @@ func handleRequest(fn http.HandlerFunc) http.HandlerFunc {
 			return r.FindStringSubmatch(fmt.Sprintf("%+v", trw))[1]
 		}
 
-		lumber.Debug(`%v - [%v] %v %v %v(%s) - "User-Agent: %s"`,
+		lumber.Debug(`%s - [%s] %s %s %s(%s) - "User-Agent: %s"`,
 			req.RemoteAddr, req.Proto, req.Method, req.RequestURI,
-			getStatus(rw), getWrote(rw), // %v(%s)
+			getStatus(rw), getWrote(rw), // %s(%s)
 			req.Header.Get("User-Agent"))
 	}
 }

@@ -29,7 +29,6 @@ var (
 	file string // blob file location
 
 	config   string // config file location
-	daemon   bool   // whether to run as server or not
 	showVers bool   // whether to print version info or not
 
 	// to be populated by linker
@@ -44,8 +43,7 @@ var (
 		SilenceErrors: true,
 		SilenceUsage:  true,
 
-		// parse the config if one is provided, or use the defaults. Set the backend
-		// driver to be used
+		// parse the config if one is provided, or use the defaults
 		PersistentPreRunE: readConfig,
 
 		// print version or help, or continue, depending on flag settings
@@ -66,8 +64,7 @@ func readConfig(ccmd *cobra.Command, args []string) error {
 
 		err := viper.ReadInConfig()
 		if err != nil {
-			fmt.Printf("ERROR: Failed to read config file: %s\n", err.Error())
-			return fmt.Errorf("")
+			return fmt.Errorf("Failed to read config file - %s", err)
 		}
 	}
 
@@ -100,7 +97,7 @@ func startHoarder(ccmd *cobra.Command, args []string) error {
 
 	// enable/start garbage collection if age config was changed
 	if ccmd.Flag("clean-after").Changed {
-		lumber.Debug("Starting garbage collector (data older than %vs)...\n", ccmd.Flag("clean-after").Value)
+		lumber.Debug("Starting garbage collector (data older than %ds)...\n", ccmd.Flag("clean-after").Value)
 
 		// start garbage collector
 		go collector.Start()
@@ -108,14 +105,12 @@ func startHoarder(ccmd *cobra.Command, args []string) error {
 
 	// set, and initialize, the backend driver
 	if err := backends.Initialize(); err != nil {
-		lumber.Error("Failed to initialize backend - %v", err)
-		return err
+		return fmt.Errorf("Failed to initialize backend - %s", err)
 	}
 
 	// start the API
 	if err := api.Start(); err != nil {
-		lumber.Fatal("Failed to start API: ", err.Error())
-		return err
+		return fmt.Errorf("Failed to start API - %s", err)
 	}
 
 	return nil
@@ -185,7 +180,7 @@ func rest(_method, _key string, _body io.ReadWriter) io.Reader {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// print error and exit
-		fmt.Fprintf(os.Stderr, "Failed to make request - %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to make request - %s\n", err)
 		os.Exit(1)
 	}
 

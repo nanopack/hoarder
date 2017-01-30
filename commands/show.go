@@ -72,7 +72,7 @@ func show(ccmd *cobra.Command, args []string) {
 	if file != "" {
 		f, err := os.Create(file)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to open file to write - %v\n", err)
+			fmt.Fprintf(os.Stderr, "Failed to open file to write - %s\n", err)
 			return
 		}
 		defer f.Close()

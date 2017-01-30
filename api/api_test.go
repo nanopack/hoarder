@@ -58,13 +58,13 @@ func TestAuth(t *testing.T) {
 	// try and get some data
 	res, err := do("GET", testKey, nil)
 	if err != nil {
-		t.Fatalf("Failed to get data - %v", err.Error())
+		t.Fatalf("Failed to get data - %s", err)
 	}
 	defer res.Body.Close()
 
 	// make sure we weren't authorized to do the action
 	if res.StatusCode != 401 {
-		t.Fatalf("Unauthorized action! - %v", res.StatusCode)
+		t.Fatalf("Unauthorized action! - %d", res.StatusCode)
 	}
 
 	// remove the token for the rest of the tests
@@ -79,7 +79,7 @@ func TestAddData(t *testing.T) {
 	//
 	res, err := do("POST", testKey, body)
 	if err != nil {
-		t.Fatalf("Failed to add data - %v", err.Error())
+		t.Fatalf("Failed to add data - %s", err)
 	}
 	defer res.Body.Close()
 
@@ -95,7 +95,7 @@ func TestUpdateData(t *testing.T) {
 	//
 	res, err := do("PUT", testKey, body)
 	if err != nil {
-		t.Fatalf("Failed to update data - %v", err.Error())
+		t.Fatalf("Failed to update data - %s", err)
 	}
 	defer res.Body.Close()
 
@@ -109,12 +109,12 @@ func TestShowData(t *testing.T) {
 	//
 	res, err := do("GET", "not-real", nil)
 	if res.StatusCode != 404 {
-		t.Fatalf("Got imaginary things - %v", res.StatusCode)
+		t.Fatalf("Got imaginary things - %d", res.StatusCode)
 	}
 
 	res, err = do("GET", testKey, nil)
 	if err != nil {
-		t.Fatalf("Failed to show data - %v", err.Error())
+		t.Fatalf("Failed to show data - %s", err)
 	}
 	defer res.Body.Close()
 
@@ -128,14 +128,14 @@ func TestHeadData(t *testing.T) {
 	//
 	res, err := do("HEAD", testKey, nil)
 	if err != nil {
-		t.Fatalf("Failed to show data - %v", err.Error())
+		t.Fatalf("Failed to show data - %s", err)
 	}
 	defer res.Body.Close()
 
 	//
 	length, _ := strconv.Atoi(res.Header.Get("Content-Length"))
 	if length != len(testData) {
-		t.Errorf("Unexpected length. Expecting %v got '%v'", len(testData), length)
+		t.Errorf("Unexpected length. Expecting %d got '%d'", len(testData), length)
 	}
 }
 
@@ -145,7 +145,7 @@ func TestListData(t *testing.T) {
 	//
 	res, err := do("GET", "", nil)
 	if err != nil {
-		t.Fatalf("Failed to list data - %v", err.Error())
+		t.Fatalf("Failed to list data - %s", err)
 	}
 	defer res.Body.Close()
 
@@ -165,7 +165,7 @@ func TestRemoveData(t *testing.T) {
 	//
 	res, err := do("DELETE", testKey, nil)
 	if err != nil {
-		t.Fatalf("Failed to remove data - %v", err.Error())
+		t.Fatalf("Failed to remove data - %s", err)
 	}
 	defer res.Body.Close()
 

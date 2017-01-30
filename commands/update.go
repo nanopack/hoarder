@@ -47,7 +47,7 @@ func update(ccmd *cobra.Command, args []string) {
 	if file != "" {
 		f, err := os.Open(file)
 		if err != nil {
-			fmt.Printf("Failed to open file to read - %v\n", err)
+			fmt.Printf("Failed to open file to read - %s\n", err)
 			return
 		}
 		defer f.Close()

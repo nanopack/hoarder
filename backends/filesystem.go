@@ -80,7 +80,7 @@ func (d Filesystem) stat(key string) (DataInfo, error) {
 func (d Filesystem) write(key string, r io.Reader) error {
 	f, err := os.Create(filepath.Join(d.Path, key))
 	if err != nil {
-		return fmt.Errorf("Failed to open file to write - %v\n", err)
+		return fmt.Errorf("Failed to open file to write - %s", err)
 	}
 	defer f.Close()
 	// defer r.Close()

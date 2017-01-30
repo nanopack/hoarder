@@ -17,7 +17,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	r, err := backends.Read(req.URL.Query().Get(":blob"))
 	if err != nil {
 		rw.WriteHeader(404)
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 	defer r.Close() // close the file
@@ -26,7 +26,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	_, err = io.Copy(rw, r)
 	if err != nil {
 		rw.WriteHeader(500)
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 }
@@ -38,7 +38,7 @@ func getHead(rw http.ResponseWriter, req *http.Request) {
 	fi, err := backends.Stat(req.URL.Query().Get(":blob"))
 	if err != nil {
 		rw.WriteHeader(404)
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 
@@ -58,7 +58,7 @@ func create(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	if err := backends.Write(key, req.Body); err != nil {
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 
@@ -78,7 +78,7 @@ func delete(rw http.ResponseWriter, req *http.Request) {
 
 	//
 	if err := backends.Remove(key); err != nil {
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 
@@ -93,7 +93,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 	fis, err := backends.List()
 	if err != nil {
 		rw.WriteHeader(500)
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 
@@ -103,7 +103,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 	jfis, err := json.Marshal(fis)
 	if err != nil {
 		rw.WriteHeader(500)
-		rw.Write([]byte(fmt.Sprintf("%s\n", err.Error())))
+		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
 	}
 

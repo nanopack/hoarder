@@ -33,7 +33,7 @@ func removeOldKeys() error {
 		if data.ModTime.Unix() < (now.Unix() - int64(viper.GetInt("clean-after"))) {
 			lumber.Debug("Cleaning key: ", data.Name)
 			if err := backends.Remove(data.Name); err != nil {
-				return fmt.Errorf("Cleaning of '%s' failed - %v", data.Name, err.Error())
+				return fmt.Errorf("Cleaning of '%s' failed - %s", data.Name, err)
 			}
 		}
 	}
@@ -47,7 +47,7 @@ func Start() {
 
 	for _ = range tick {
 		if err := removeOldKeys(); err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("Failed to remove old keys - %s\n", err)
 		}
 	}
 }

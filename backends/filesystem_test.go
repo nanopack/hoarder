@@ -56,7 +56,7 @@ func TestList(t *testing.T) {
 		t.Error("Failed to LIST file - ", err)
 	}
 	if DataInfo[0].Name != "testfile" {
-		t.Error("Failed to LIST file - incorrect file found: %s", DataInfo[0].Name)
+		t.Errorf("Failed to LIST file - incorrect file found: %s", DataInfo[0].Name)
 	}
 }
 
