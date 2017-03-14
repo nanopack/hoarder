@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/jcelliott/lumber"
+
 	"github.com/nanopack/hoarder/backends"
 )
 
@@ -25,6 +27,7 @@ func get(rw http.ResponseWriter, req *http.Request) {
 	// pipe the file rather than consume the rams
 	_, err = io.Copy(rw, r)
 	if err != nil {
+		lumber.Error("Failed to pipe file to client - %s", err.Error())
 		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
@@ -92,6 +95,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 	//
 	fis, err := backends.List()
 	if err != nil {
+		lumber.Error("Failed to list backends - %s", err.Error())
 		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
@@ -102,6 +106,7 @@ func list(rw http.ResponseWriter, req *http.Request) {
 	//
 	jfis, err := json.Marshal(fis)
 	if err != nil {
+		lumber.Error("Failed to marshal results - %s", err.Error())
 		rw.WriteHeader(500)
 		rw.Write([]byte(fmt.Sprintf("%s\n", err)))
 		return
