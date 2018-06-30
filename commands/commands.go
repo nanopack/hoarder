@@ -92,7 +92,7 @@ func startHoarder(ccmd *cobra.Command, args []string) error {
 	logLvl := lumber.LvlInt(viper.GetString("log-level"))
 
 	// configure the logger
-	lumber.Prefix("[hoader]")
+	lumber.Prefix("[hoarder]")
 	lumber.Level(logLvl)
 
 	// enable/start garbage collection if age config was changed
