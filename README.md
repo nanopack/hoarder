@@ -1,4 +1,5 @@
-[![hoarder logo](http://nano-assets.gopagoda.io/readme-headers/hoarder.png)](http://nanobox.io/open-source#hoarder)  
+# Hoarder
+
 [![Build Status](https://travis-ci.org/nanopack/hoarder.svg)](https://travis-ci.org/nanopack/hoarder)
 [![GoDoc](https://godoc.org/github.com/nanopack/hoarder?status.svg)](https://godoc.org/github.com/nanopack/hoarder)
 
